@@ -101,7 +101,6 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
   const [template, setTemplate] = useState<ReceiptTemplate>(() => parseReceiptTemplate(stored));
   const [variable, setVariable] = useState<string>('token');
   const [error, setError] = useState('');
-  const [systemTest, setSystemTest] = useState(false);
   const rows = useMemo(() => buildReceiptRows(template, sampleContext), [template]);
   const update = (blocks: readonly ReceiptBlock[]) => setTemplate((p) => ({ ...p, blocks }));
   const addVariable = () => {
@@ -171,7 +170,6 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       {error ? <p className={kit.err} role="alert">{error}</p> : null}
-      {systemTest ? <SystemPrintTestSheet onClose={() => setSystemTest(false)} /> : null}
       <div className={kit.row}>
         <button type="button" className={kit.quiet} onClick={() => setTemplate(DEFAULT_RECEIPT_TEMPLATE)}>Restore default</button>
         <span className={kit.grow} />
@@ -209,6 +207,7 @@ function PrinterSettings() {
   const [printer, setPrinter] = useState<PrinterChoice | null>(() => selectedPrinter());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [systemTest, setSystemTest] = useState(false);
   const selectBle = async () => {
     setBusy(true); setError('');
     try { setPrinter(await selectBluetoothPrinter()); }
@@ -244,6 +243,7 @@ function PrinterSettings() {
       {!canBluetoothPrint() || !canUsbPrint() ? <p className={kit.hint}>This browser does not expose every direct printer connection. On iPad, use the system Print sheet with an AirPrint-compatible printer.</p> : null}
       <p className={kit.hint}>Bluetooth here means BLE/GATT. Many low-cost thermal printers use Bluetooth Classic (SPP), which browser Bluetooth cannot access. USB requires a USB Printer Class device and a browser with WebUSB.</p>
       {error ? <p className={kit.err} role="alert">{error}</p> : null}
+      {systemTest ? <SystemPrintTestSheet onClose={() => setSystemTest(false)} /> : null}
     </>
   );
 }
