@@ -46,6 +46,8 @@
   position: absolute; top: 1.125rem; right: 1rem; z-index: 3; pointer-events: none;
   font-size: 0.75rem; line-height: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; color: var(--dl-color-text-faint);
 }
+.unit { font-size: 0.72em; font-weight: 400; letter-spacing: 0; color: var(--dl-color-text-muted); }
+.options { position: absolute; top: 3rem; right: 0.75rem; z-index: 3; pointer-events: none; font-size: 0.6875rem; line-height: 1rem; color: var(--dl-color-accent); }
 .stockLow { composes: stock; color: var(--dl-stall-warn-text); }
 .stockOut { composes: stock; color: var(--dl-stall-danger-text); }
 .pencil { position: absolute; top: 0.25rem; right: 0.25rem; z-index: 3; width: var(--dl-hit-min); height: var(--dl-hit-min); display: grid; place-items: center; color: var(--dl-color-text-muted); }
