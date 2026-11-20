@@ -7,7 +7,7 @@ describe('receipt template engine', () => {
       values: { businessName: 'Momo Bus', token: '#012', total: '₹240', thankYouNote: 'See you again' },
       items: [{ name: 'Veg Momos', quantity: 2, rate: '₹100', amount: '₹200' }],
     });
-    const plain = rows.filter((x) => x.type === 'text').map((x) => x.type === 'text' ? x.left + (x.right ?? '') : '');
+    const plain = rows.filter((x) => x.type === 'text').map((x) => x.left + (x.right ?? ''));
     expect(plain).toContain('Momo Bus');
     expect(plain).toContain('#012');
     expect(plain).toContain('2 × Veg Momos');
