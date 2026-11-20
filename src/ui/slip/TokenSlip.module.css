@@ -9,12 +9,17 @@
 .lines li, .total { display: flex; justify-content: space-between; gap: 2mm; }
 .total { margin-top: 2mm; padding-top: 1.5mm; border-top: 0.3mm dashed var(--dl-stall-paper-ink); font-weight: 700; font-size: 3.6mm; }
 .foot { margin-top: 3mm; text-align: center; font-size: 2.8mm; }
+.receiptRow { display: flex; align-items: baseline; justify-content: space-between; gap: 2mm; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.35; }
+.center { justify-content: center; text-align: center; }
+.right { justify-content: flex-end; text-align: right; }
+.rule { margin: 2mm 0; border-bottom: 0.25mm dashed var(--dl-stall-paper-ink); font-size: 0; line-height: 0; }
+.logo { display: block; max-width: 100%; max-height: 24mm; object-fit: contain; margin: 1mm auto 2mm; }
 .close { min-height: var(--dl-hit-comfortable); padding: 0 1.5rem; border-radius: var(--dl-radius-md); font-weight: 600; color: var(--dl-color-text); background: var(--dl-color-surface); }
 
 .btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
 .msg { margin: 0; font-size: 0.875rem; color: var(--dl-color-text-muted); text-align: center; }
 
-@page { size: 58mm auto; margin: 0; }
+@page { size: auto; margin: 0; }
 @media print {
   :global(body *) { visibility: hidden; }
   .slip, .slip * { visibility: visible; }
