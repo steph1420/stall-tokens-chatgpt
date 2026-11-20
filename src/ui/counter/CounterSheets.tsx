@@ -58,7 +58,7 @@ function CategoryPick({ value, cats, onPick }: { value: string; cats: readonly s
 }
 
 function optionRows(options: readonly MenuPriceOption[] | undefined): string {
-  return (options ?? []).map((x) => \`\${x.name} | \${String(x.priceDelta / R)}\`).join('\n');
+  return (options ?? []).map((x) => `${x.name} | ${String(x.priceDelta / R)}`).join('\n');
 }
 function parseOptionRows(text: string, existing: readonly MenuPriceOption[] | undefined): MenuPriceOption[] | null {
   const old = new Map((existing ?? []).map((x) => [x.name.trim().toLowerCase(), x.id]));
