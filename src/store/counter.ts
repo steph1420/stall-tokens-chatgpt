@@ -85,7 +85,7 @@ function navActions(x: Ctx) {
       }
       const dayId = currentDay();
       const range = CONFIG.tokens.ranges[st().prefs.rangeIndex] ?? CONFIG.tokens.ranges[0];
-      const token = nextToken(Object.values(st().folded.orders), dayId, range); // deleted orders keep their numbers
+      const token = nextToken(Object.values(st().folded.orders), dayId, range); // deleted orders release their numbers
       const orderId = core.env.makeId();
       const p = st().prefs;
       log.dispatch('order.create', { orderId, dayId, token, servedBy: p.servingName, device: deviceLabel(p.servingName, p.deviceId) });
