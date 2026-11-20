@@ -116,8 +116,10 @@ function StationHeader({ station, count }: { station: string; count: number }) {
   return (
     <div className={k.hdr}>
       <div className={k.kicker}>{stallName}</div>
-      <button type="button" className={k.back} aria-label="Back" onClick={() => { a.closeStation(); }}><Icon name="chevLeft" /></button>
-      <button type="button" className={k.back} aria-label="Home" title="Home" onClick={() => { go('launch'); }}><Icon name="home" /></button>
+      <div className={k.navButtons}>
+        <button type="button" className={k.back} aria-label="Back" onClick={() => { a.closeStation(); }}><Icon name="chevLeft" /></button>
+        <button type="button" className={k.back} aria-label="Home" title="Home" onClick={() => { go('launch'); }}><Icon name="home" /></button>
+      </div>
       <h1 className={s.title}><Icon name={stationIcon(station)} className={s.titleIc} /><span>{`${station} · ${String(count)}`}</span></h1>
       <button type="button" className={k.open} onClick={() => { openSheet({ kind: 'overview' }); }}>Overview</button>
     </div>
