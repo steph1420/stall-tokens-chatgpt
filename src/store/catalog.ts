@@ -7,6 +7,7 @@ import * as amounts from './rules/amounts';
 
 export type ItemDraft = Pick<ItemFields, 'name' | 'price' | 'swatch' | 'category' | 'stationId'> & { count: number | null; unit?: string; addons?: readonly MenuPriceOption[]; variants?: readonly MenuPriceOption[]; secondaryUnit?: string; secondaryUnitsPerPrimary?: number; discountKind?: 'none' | 'amount' | 'pct'; discountValue?: number };
 
+// eslint-disable-next-line max-lines-per-function -- item validation and persistence form one atomic domain action.
 function itemActions(core: Core, log: Log) {
   const st = () => core.get();
   return {
