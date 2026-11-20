@@ -51,6 +51,34 @@ describe('counter flow (F-06..F-18)', () => {
     expect(s().folded.orders[second]?.token).toBe(2);
   });
 
+  it('adds configured variants and add-ons at the final per-unit price, with unit snapshots', async () => {
+    const { s } = await ready();
+    const ids = seedMenu(s);
+    const itemId = ids.tea ?? '';
+    const original = s().folded.items[itemId];
+    if (!original) throw new Error('seed item missing');
+    expect(s().catalog.saveItem(itemId, {
+      name: original.name, price: 2000, swatch: original.swatch, category: original.category, stationId: original.stationId, count: null,
+      unit: 'cup', secondaryUnit: 'ml', secondaryUnitsPerPrimary: 250,
+      variants: [{ id: 'regular', name: 'Regular', priceDelta: 0 }, { id: 'large', name: 'Large', priceDelta: 500 }],
+      addons: [{ id: 'milk', name: 'Extra milk', priceDelta: 200 }],
+      discountKind: 'pct', discountValue: 10,
+    })).toBeNull();
+    s().counter.addItem(itemId, { variantId: 'large', addonIds: ['milk'] });
+    const order = cur(s);
+    expect(order.lines).toHaveLength(1);
+    expect(order.lines[0]).toMatchObject({
+      name: 'Tea · Large · + Extra milk', price: 2500, variant: 'Large',
+      addons: ['Extra milk'], unit: 'cup', secondaryUnit: 'ml', secondaryUnitsPerPrimary: 250,
+    });
+    s().counter.addItem(itemId, { variantId: 'large', addonIds: ['milk'] });
+    expect(cur(s).lines[0]?.qty).toBe(2);
+    expect(bill.subtotal(cur(s))).toBe(5000);
+    s().counter.addItem(itemId, { variantId: 'regular' });
+    expect(cur(s).lines).toHaveLength(2);
+    expect(cur(s).lines[1]?.price).toBe(1800);
+  });
+
   it('sold out and low stock stop extra taps; stock never goes below 0 from the panel', async () => {
     const { s } = await ready();
     const id = seedMenu(s);
