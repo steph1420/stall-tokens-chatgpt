@@ -75,4 +75,4 @@ export interface UiState {
   readonly dayKept: string;
 }
 
-export const initialUi: UiState = { screen: 'launch', orderId: null, pages: {}, sheet: null, toast: null, payUndo: null, kitchenFilter: null, station: null, counterTab: 'new', openId: null, stallFrom: 'launch', unlocked: false, orderView: null, waitFor: null, waitLabel: '', heldHere: [], nextCheckAt: 0, pendingItem: '', dayKept: '' };
+export const initialUi: UiState = { screen: 'launch', orderId: null, pages: {}, sheet: null, toast: null, payUndo: null, kitchenFilter: null, station: null, counterTab: 'new', openId: null, stallFrom: 'launch', unlocked: false, orderView: null, waitFor: null, waitLabel: '', heldHere: [], nextCheckAt: 0, pendingItem: '', pendingItemOptions: null, dayKept: '' };
