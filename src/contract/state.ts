@@ -9,6 +9,11 @@ export interface Line {
   readonly committed: number; // qty already taken out of stock (sent or paid)
   readonly byCounter: boolean; // Q-COUNTER-FINISH: Ready because the Counter marked it, not the station
   readonly restocked: number; // Q-REFUND-1 A: qty of this line put back to stock by live (not voided) refunds
+  readonly variant?: string;
+  readonly addons?: readonly string[];
+  readonly unit?: string;
+  readonly secondaryUnit?: string;
+  readonly secondaryUnitsPerPrimary?: number;
 }
 export interface Discount { readonly kind: 'amount' | 'pct'; readonly value: number; readonly allowedBy: string; readonly note: string }
 export interface Payment {
