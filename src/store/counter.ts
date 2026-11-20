@@ -129,6 +129,7 @@ function dayActions(x: Ctx) {
   return self;
 }
 
+// eslint-disable-next-line max-lines-per-function -- order-line actions share a single log and order validation context.
 function lineActions(x: Ctx, nav: Nav) {
   const { core, log, st, toast, current, available, editable } = x;
   const self = {
