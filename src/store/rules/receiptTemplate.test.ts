@@ -37,4 +37,23 @@ describe('receipt template engine', () => {
     expect(loaded.blocks).toEqual(template.blocks);
     expect(buildReceiptRows(loaded, { values: {}, items: [] })[0]).toMatchObject({ type: 'image', widthDots: 256 });
   });
+  it('lets the item-list block omit quantity, unit, rate, amount and notes', () => {
+    const template: ReceiptTemplate = {
+      ...DEFAULT_RECEIPT_TEMPLATE,
+      blocks: [{ id: 'items', type: 'items', showQty: false, showUnit: false, showRate: false, showAmount: false, showItemNote: false }],
+    };
+    const rows = buildReceiptRows(template, {
+      values: {},
+      items: [{ name: 'Veg Momos', quantity: 2, unit: 'plate', rate: '₹100', amount: '₹200', note: 'No onion' }],
+    });
+    expect(rows).toEqual([{ type: 'text', left: 'Veg Momos', align: 'left', bold: false, large: false }]);
+  });
+
+  it('round-trips feed and cutter preferences with safe defaults', () => {
+    const template = { ...DEFAULT_RECEIPT_TEMPLATE, feedLines: 1, cutPaper: true };
+    expect(parseReceiptTemplate(JSON.stringify(template))).toMatchObject({ feedLines: 1, cutPaper: true });
+    expect(parseReceiptTemplate(undefined)).toMatchObject({ feedLines: 4, cutPaper: false });
+    expect(parseReceiptTemplate(JSON.stringify({ ...template, feedLines: 99 }))).toEqual(DEFAULT_RECEIPT_TEMPLATE);
+  });
+
 });
