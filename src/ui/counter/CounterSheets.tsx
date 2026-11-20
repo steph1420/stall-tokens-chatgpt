@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { CONFIG } from '../../config';
 import { formatInr, parseRupees, type Order, type Paise } from '../../contract';
-import { amounts, bill, useApp } from '../../store';
+import { amounts, bill, cats, menuUnitPrice, useApp } from '../../store';
 import { AmountsEdit } from '../kit/AmountsEdit';
 import { Money } from '../kit/Money';
 import { Sheet } from '../kit/Sheet';
