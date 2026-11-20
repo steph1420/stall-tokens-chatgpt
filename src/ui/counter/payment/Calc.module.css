@@ -1,0 +1,16 @@
+/* F-63 pay3 calculator sheet: big square keys (calm Stream Deck look), tokens only, rem so 200 % text scales. */
+.screen { padding: 0.5rem 0.75rem 0.75rem; text-align: right; overflow-wrap: anywhere; }
+.pending { min-height: 1.25rem; font-size: 0.9375rem; color: var(--dl-color-text-muted); }
+.shown { display: block; font-weight: var(--dl-stall-num-weight); font-size: 3rem; line-height: 1.1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--dl-color-text-display); }
+.keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; padding: 0 0.25rem; }
+.k { min-height: 3.5rem; border-radius: var(--dl-radius-md); font-size: 1.5rem; font-weight: 500; color: var(--dl-color-text); background: var(--dl-color-surface); box-shadow: inset 0 0 0 var(--dl-stall-hair) var(--dl-color-hairline); }
+.kZero { composes: k; grid-column: span 2; }
+.kUtil { composes: k; font-size: 1.125rem; color: var(--dl-color-text-muted); background: var(--dl-color-track); }
+.kOp { composes: k; color: var(--dl-color-accent); background: color-mix(in srgb, var(--dl-color-accent) 12%, var(--dl-color-surface)); }
+.kEq { composes: k; grid-row: span 2; color: var(--dl-stall-on-cta); background: var(--dl-stall-cta); font-weight: 700; }
+.bs { display: inline-flex; width: 1.5rem; height: 1.25rem; }
+.bs svg { width: 100%; height: 100%; }
+.use { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0.75rem 0.25rem 0; }
+.useBtn { min-height: var(--dl-hit-min); border-radius: var(--dl-radius-pill); font-size: 0.9375rem; font-weight: 650; color: var(--dl-color-accent); background: var(--dl-color-track); }
+.close { width: 100%; min-height: var(--dl-hit-min); margin-top: 0.5rem; font-size: 1rem; color: var(--dl-color-text-muted); }
+@container (max-width: 20rem) { .k { font-size: 1.25rem; } .use { grid-template-columns: 1fr; } }
