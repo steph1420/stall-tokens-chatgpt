@@ -1,0 +1,44 @@
+# CI gate (06 rule 5). Every step must pass. No deploy step: go-live is a separate step with Steve's OK.
+name: CI
+on:
+  push:
+    branches: [main, 'feat/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Exact pins + lockfile
+        run: node checks/check-pins.mjs
+      - name: Leak scan
+        run: node checks/leak-scan.mjs
+      - name: Build output not tracked
+        run: node checks/check-build-output.mjs
+      - name: Feature IDs match FEATURES.md
+        run: node scripts/check-feature-ids.mjs
+      - name: Install
+        run: npm ci
+      - name: Tokens match tokens.json
+        run: npm run tokens && git diff --exit-code src/tokens
+      - name: Typecheck
+        run: npm run typecheck
+      - name: ESLint
+        run: npm run lint
+      - name: Stylelint
+        run: npm run lint:css
+      - name: Dependency rules
+        run: npm run depcruise
+      - name: Contrast night and day
+        run: npm run contrast
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
