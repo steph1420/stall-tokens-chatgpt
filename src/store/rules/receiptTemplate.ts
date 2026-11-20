@@ -2,8 +2,8 @@
 export const PRINT_VARIABLES = [
   ['businessName', 'Business / bus name'], ['eventName', 'Event name'], ['address', 'Address'],
   ['contact', 'Contact number'], ['slogan', 'Slogan'], ['welcomeNote', 'Welcome note'],
-  ['token', 'Token number'], ['dateTime', 'Date and time'], ['customerName', 'Customer name'],
-  ['orderNote', 'Overall order note'], ['subtotal', 'Subtotal'], ['discount', 'Discount'],
+  ['token', 'Token number'], ['dateTime', 'Date and time'], ['servingName', 'Served by'], ['customerName', 'Customer name'],
+  ['orderNote', 'Overall order note'], ['subtotal', 'Subtotal'], ['discount', 'Discount'], ['roundOff', 'Round-off'], ['tip', 'Tip'],
   ['total', 'Grand total'], ['paymentMode', 'Payment method'], ['paid', 'Amount paid'],
   ['balance', 'Balance due'], ['thankYouNote', 'Thank-you note'],
 ] as const;
@@ -40,12 +40,15 @@ export const DEFAULT_RECEIPT_TEMPLATE: ReceiptTemplate = {
     { id: 'b-rule-1', type: 'divider' },
     variable('b-token', 'token', { align: 'center', bold: true, large: true }),
     variable('b-date', 'dateTime', { align: 'center' }),
+    variable('b-serving', 'servingName'),
     variable('b-customer', 'customerName'),
     { id: 'b-items', type: 'items' },
     variable('b-order-note', 'orderNote'),
     { id: 'b-rule-2', type: 'divider' },
     variable('b-subtotal', 'subtotal'),
     variable('b-discount', 'discount'),
+    variable('b-roundoff', 'roundOff'),
+    variable('b-tip', 'tip'),
     variable('b-total', 'total', { bold: true, large: true }),
     variable('b-payment', 'paymentMode'),
     variable('b-paid', 'paid'),
@@ -95,11 +98,15 @@ export function buildReceiptRows(template: ReceiptTemplate, context: ReceiptCont
     }
     const value = context.values[block.key] ?? '';
     if (!value.trim()) continue;
-    const paired = ['subtotal', 'discount', 'total', 'paid', 'balance'].includes(block.key);
+    const label: Partial<Record<PrintVariable, string>> = {
+      subtotal: 'Subtotal', discount: 'Discount', roundOff: 'Round-off', tip: 'Tip',
+      total: 'TOTAL', paid: 'Paid', balance: 'Balance',
+    };
+    const pairLabel = label[block.key];
     rows.push({
       type: 'text',
-      left: paired ? ({ subtotal: 'Subtotal', discount: 'Discount', total: 'TOTAL', paid: 'Paid', balance: 'Balance' } as const)[block.key as 'subtotal' | 'discount' | 'total' | 'paid' | 'balance'] : value,
-      ...(paired ? { right: value } : {}),
+      left: pairLabel ?? value,
+      ...(pairLabel ? { right: value } : {}),
       align: block.align ?? 'left',
       bold: block.bold ?? block.key === 'total',
       large: block.large ?? false,
