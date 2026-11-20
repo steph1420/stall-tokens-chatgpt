@@ -26,6 +26,7 @@ function Card({ it }: { it: Item }) {
   const badge = stockLabel(it, left);
   const out = badge?.tone === 'out';
   const add = () => {
+    if (out) { c.addItem(it.id); return; }
     if ((it.variants?.length ?? 0) > 0 || (it.addons?.length ?? 0) > 0) openSheet({ kind: 'menuOptions', itemId: it.id });
     else c.addItem(it.id);
   };
