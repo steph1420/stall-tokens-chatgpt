@@ -32,6 +32,7 @@ function Row({ line, n, sel, onSel }: { line: Line; n: number; sel: boolean; onS
       <td className={s.item}>
         <button type="button" className={s.itemBtn} onClick={() => { openSheet({ kind: 'lineNote', lineId: line.lineId }); }} aria-label={`${line.name}, ${line.note ? 'edit' : 'add'} note`}>
           <b>{line.name} <Icon name="note" className={line.note ? s.niconHas : s.nicon} /></b>
+          {line.unit ? <span className={s.cat}>{line.unit}{line.secondaryUnit ? ` · ${String(line.secondaryUnitsPerPrimary ?? 1)} ${line.secondaryUnit}` : ''}</span> : null}
           {line.category ? <span className={s.cat}>{line.category}</span> : null}
           {line.note ? <em className={s.itemNote}>{line.note}</em> : null}
         </button>
