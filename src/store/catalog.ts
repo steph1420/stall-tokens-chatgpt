@@ -82,7 +82,11 @@ function payeeActions(core: Core, log: Log) {
       return null;
     },
     /** Shared stall settings (stall name). Trimmed and length-capped. */
-    setSetting(key: string, value: string) { log.dispatch('setting.set', { key, value: value.trim().replace(/\s+/g, ' ').slice(0, CONFIG.limits.nameMaxChars) }); },
+    setSetting(key: string, value: string) {
+      const content = key === 'printTemplate' ? value : value.trim().replace(/\\s+/g, ' ');
+      const limit = key === 'printTemplate' ? 200_000 : CONFIG.limits.recordTextMax;
+      log.dispatch('setting.set', { key, value: content.slice(0, limit) });
+    },
     /** F-45 tip choices / round-off steps for every phone: text in rupees; returns an error line or null. */
     setAmounts(key: amounts.AmountsKey, text: string): string | null {
       const r = amounts.parseRupees(text, key);
