@@ -1,0 +1,26 @@
+/* P2 sheets (s122, s123, W-22). 44px+ targets; long names wrap. */
+.none { margin: 1.5rem 0; text-align: center; color: var(--dl-color-text-muted); font-size: 0.9375rem; line-height: 1.5; }
+.lead, .hint { margin: 0 0 0.75rem; color: var(--dl-color-text-muted); }
+.lead { color: var(--dl-color-text); }
+.hint { margin-top: 0.75rem; font-size: 0.8125rem; }
+.stack { display: flex; flex-direction: column; gap: var(--dl-hit-gap); }
+.stack > button, .full { width: 100%; }
+.full { margin-top: 0.75rem; }
+.list { list-style: none; margin: 0 0 0.75rem; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0.5rem; }
+.open { min-height: var(--dl-hit-stage); display: flex; flex-direction: column; text-align: left; min-width: 0; padding: 0.25rem 0; }
+.open span { overflow-wrap: anywhere; color: var(--dl-color-text); }
+.open small { font-size: 0.8125rem; color: var(--dl-color-text-muted); }
+.amt { font-weight: 600; white-space: nowrap; }
+.discard { min-height: var(--dl-hit-min); padding: 0 0.75rem; border-radius: var(--dl-radius-md); color: var(--dl-color-text); background: var(--dl-color-track); }
+.discardOn { composes: discard; color: var(--dl-stall-on-danger); background: var(--dl-stall-del-bg); font-weight: 700; }
+.pick { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+.pick > span:first-child { overflow-wrap: anywhere; }
+.step { display: inline-flex; align-items: center; gap: 0.25rem; }
+.step button { width: var(--dl-hit-min); height: var(--dl-hit-min); border-radius: 50%; font-size: 1.25rem; background: var(--dl-color-track); color: var(--dl-color-text); }
+.step b { min-width: 1.5rem; text-align: center; font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+.chip { min-height: var(--dl-hit-min); padding: 0 0.875rem; border-radius: var(--dl-radius-pill); color: var(--dl-color-text); background: var(--dl-color-track); }
+.chipOn { composes: chip; color: var(--dl-stall-on-cta); background: var(--dl-stall-cta); font-weight: 600; }
+.check { display: flex; align-items: center; gap: 0.5rem; min-height: var(--dl-hit-min); }
+.check input { width: 1.25rem; height: 1.25rem; }
