@@ -27,6 +27,7 @@ async function one(theme, [label, w, h, t]) {
     if (await bill.count()) await bill.last().click().catch(() => undefined);
     await p.waitForTimeout(300);
     await p.getByRole('button', { name: /^Pay/ }).first().click(); await p.waitForTimeout(300);
+    await p.getByRole('group', { name: 'How to pay' }).getByRole('button', { name: 'Split', exact: true }).click();
     await p.getByRole('button', { name: 'Lock UPI' }).click(); await p.waitForTimeout(150);
     const lockBox = await p.getByRole('button', { name: 'Unlock UPI' }).boundingBox();
     await p.screenshot({ path: `${out}/lock-${label}-${theme}.png` });
