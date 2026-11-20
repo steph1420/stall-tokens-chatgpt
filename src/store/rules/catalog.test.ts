@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CONFIG } from '../../config';
 import { compareOps, type Bodies, type Op, type OpKind, type VV } from '../../contract';
 import { fold } from '../fold/fold';
-import { activeStations, categories, categoryIdFor, itemCategoryId, stations } from './catalog';
+import { activeStations, categories, categoryIdFor, itemCategoryId, menuUnitPrice, stations } from './catalog';
 
 /** Test-only: fail loudly instead of a non-null assertion. */
 const must = <T,>(x: T | null | undefined): T => { if (x === null || x === undefined) throw new Error('missing'); return x; };
@@ -60,5 +60,33 @@ describe('stations (PK-6 A)', () => {
     expect(all.find((x) => x.id === 'Cutlets')?.active).toBe(false);
     expect(all.at(-1)?.id).toBe('Grill');
     expect(activeStations(s.records.station).map((x) => x.id)).not.toContain('Cutlets');
+  });
+});
+
+
+describe('menu customisation pricing', () => {
+  it('applies the item discount before variant and add-on adjustments', () => {
+    const item = {
+      price: 2000,
+      discountKind: 'pct' as const,
+      discountValue: 10,
+      variants: [{ id: 'large', name: 'Large', priceDelta: 500 }],
+      addons: [{ id: 'cheese', name: 'Cheese', priceDelta: 200 }],
+    };
+    expect(menuUnitPrice(item)).toBeNull();
+    expect(menuUnitPrice(item, 'large', [])).toBe(2300);
+    expect(menuUnitPrice(item, 'large', ['cheese'])).toBe(2500);
+    expect(menuUnitPrice(item, 'missing', [])).toBeNull();
+    expect(menuUnitPrice(item, 'large', ['missing'])).toBeNull();
+  });
+
+  it('accepts free add-ons and clamps a negative adjusted price to zero', () => {
+    const item = {
+      price: 100,
+      discountKind: 'amount' as const,
+      discountValue: 100,
+      addons: [{ id: 'free', name: 'No charge', priceDelta: 0 }],
+    };
+    expect(menuUnitPrice(item, undefined, ['free'])).toBe(0);
   });
 });
