@@ -7,11 +7,13 @@ import s from './Stall.module.css';
 
 export function StallPage({ title, right, bar, children }: { title: string; right?: ReactNode; bar?: ReactNode; children: ReactNode }) {
   const close = useApp((st) => st.closeStall);
+  const go = useApp((st) => st.go);
   return (
     <div className={s.page}>
       <header className={s.top}>
         <button type="button" className={s.back} aria-label="Back" onClick={close}><Icon name="chevLeft" /></button>
         <h1 className={s.title}>{title}</h1>
+        <button type="button" className={s.back} aria-label="Home" title="Home" onClick={() => { go('launch'); }}><Icon name="home" /></button>
         {right}
       </header>
       <main className={s.body}>{children}</main>
