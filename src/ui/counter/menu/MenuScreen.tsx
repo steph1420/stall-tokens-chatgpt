@@ -92,6 +92,7 @@ export function MenuScreen() {
         </button>
       </main>
       <footer className={s.bar}>
+        <button type="button" className={s.noteBtn} disabled={!order} onClick={() => { openSheet({ kind: 'orderNote' }); }} aria-label="Add overall order note">Note</button>
         <div className={s.meta}>
           <Money p={order ? bill.subtotal(order) : 0} className={s.total} />
           <span className={s.count}>· {count} {count === 1 ? 'item' : 'items'}</span>
