@@ -1,0 +1,50 @@
+/* s120 Unpaid tab + s121/s122 order view (P2). Rows and actions are 44px+; long names wrap; 200% text reflows. */
+.page { container-type: inline-size; }
+.page, .view { font-size: 1rem; flex: 1; min-height: 0; overflow-y: auto; padding: 0.75rem 1rem calc(1.5rem + env(safe-area-inset-bottom)); }
+.empty { flex: 1; display: grid; place-content: center; gap: 0.5rem; text-align: center; color: var(--dl-color-text-muted); padding: 2rem 1rem; }
+.empty b { color: var(--dl-color-text-display); font-size: 1.0625rem; }
+.empty p { margin: 0; }
+.sum { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; padding: 0.25rem 0.25rem 0.875rem; color: var(--dl-color-text-muted); font-size: 0.9375rem; }
+.sumAmt { font-family: var(--dl-stall-font-display); font-size: 1.875rem; font-weight: 300; letter-spacing: -0.02em; color: var(--dl-color-danger); }
+.list {
+  list-style: none; margin: 0; padding: 0; border-radius: var(--dl-radius-lg); overflow: hidden;
+  background: var(--dl-color-surface-solid); box-shadow: var(--dl-stall-card-lift), inset 0 0 0 var(--dl-stall-hair) var(--dl-color-hairline);
+}
+.list li + li { border-top: var(--dl-stall-hair) solid var(--dl-color-hairline); }
+.row {
+  width: 100%; min-height: 4rem; padding: 0.625rem 0.875rem 0.625rem 1rem;
+  display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 0.75rem; text-align: left;
+}
+.row svg { width: 0.875rem; height: 0.875rem; color: var(--dl-color-text-faint); }
+.tok { font-family: var(--dl-stall-font-display); font-size: 1.375rem; font-weight: 300; color: var(--dl-color-text-muted); font-variant-numeric: tabular-nums; }
+.mid { min-width: 0; display: flex; flex-direction: column; }
+.who { overflow-wrap: anywhere; font-weight: 600; color: var(--dl-color-text-display); }
+.mid small { font-size: 0.8125rem; color: var(--dl-color-text-muted); }
+.amt { font-size: 1.0625rem; color: var(--dl-color-danger); white-space: nowrap; }
+@container (max-width: 20em) { .row { grid-template-columns: auto 1fr; } .amt { grid-column: 2; } .row svg { display: none; } }
+.vTop { display: flex; align-items: center; gap: 0.25rem; margin: -0.25rem 0 0.25rem -0.5rem; }
+.vTop b { font-size: 1.125rem; font-weight: 600; color: var(--dl-color-text-display); }
+.vBack { flex: none; width: var(--dl-hit-min); height: var(--dl-hit-min); display: grid; place-items: center; color: var(--dl-color-text); }
+.vBack svg { width: 1rem; height: 1rem; }
+.vHead { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+.vTok { font-family: var(--dl-stall-font-display); font-size: 3rem; font-weight: 300; letter-spacing: -0.03em; color: var(--dl-color-text-display); line-height: 1.1; }
+.vDue { font-weight: 600; color: var(--dl-color-danger); }
+.vPaid { font-weight: 600; color: var(--dl-stall-pos-text); }
+.vMeta { margin: 0.125rem 0 0.875rem; color: var(--dl-color-text-muted); overflow-wrap: anywhere; }
+.dock {
+  flex: none; display: flex; flex-wrap: wrap; gap: var(--dl-hit-gap); padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--dl-color-surface-chrome); box-shadow: inset 0 var(--dl-stall-hair) 0 var(--dl-color-hairline);
+}
+.dock > button { flex: 1 1 8rem; min-height: var(--dl-hit-comfortable); }
+.lines { list-style: none; margin: 0 0 0.75rem; padding: 0.25rem 1rem; border-radius: var(--dl-radius-lg); background: var(--dl-color-surface-solid); box-shadow: inset 0 0 0 var(--dl-stall-hair) var(--dl-color-hairline); }
+.lines li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; padding: 0.625rem 0; }
+.lines li + li { border-top: var(--dl-stall-hair) solid var(--dl-color-hairline); }
+.lines li span:first-child { overflow-wrap: anywhere; }
+.tot { font-weight: 700; }
+.note { color: var(--dl-stall-warn-text); font-size: 0.875rem; }
+.vNote { margin: 0 0 0.75rem; color: var(--dl-color-text-muted); }
+.acts { display: flex; flex-direction: column; gap: var(--dl-hit-gap); }
+.acts > button { width: 100%; }
+.link { min-height: var(--dl-hit-min); color: var(--dl-color-accent); font-weight: 600; text-align: center; }
+.chev { display: grid; color: var(--dl-color-text-muted); }
+.chev svg { width: 0.75rem; height: 0.75rem; transform: scaleX(-1); }
