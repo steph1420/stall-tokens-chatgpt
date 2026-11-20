@@ -9,6 +9,7 @@ import { useApp } from '../../../store';
 import { Sheet } from '../../kit/Sheet';
 import kit from '../../kit/kit.module.css';
 import { Group, Opt } from './Opt';
+import ps from './PrintSettings.module.css';
 
 const DETAILS = [
   { key: 'address', label: 'Address', placeholder: 'Street, area, city' },
@@ -100,6 +101,7 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
   const [template, setTemplate] = useState<ReceiptTemplate>(() => parseReceiptTemplate(stored));
   const [variable, setVariable] = useState<string>('token');
   const [error, setError] = useState('');
+  const [systemTest, setSystemTest] = useState(false);
   const rows = useMemo(() => buildReceiptRows(template, sampleContext), [template]);
   const update = (blocks: readonly ReceiptBlock[]) => setTemplate((p) => ({ ...p, blocks }));
   const addVariable = () => {
@@ -169,11 +171,35 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       {error ? <p className={kit.err} role="alert">{error}</p> : null}
+      {systemTest ? <SystemPrintTestSheet onClose={() => setSystemTest(false)} /> : null}
       <div className={kit.row}>
         <button type="button" className={kit.quiet} onClick={() => setTemplate(DEFAULT_RECEIPT_TEMPLATE)}>Restore default</button>
         <span className={kit.grow} />
         <button type="button" className={kit.cta} onClick={() => { a.catalog.setSetting('printTemplate', JSON.stringify(template)); a.money.toast('Receipt template saved'); onClose(); }}>Save template</button>
       </div>
+    </Sheet>
+  );
+}
+
+
+function SystemPrintTestSheet({ onClose }: { onClose: () => void }) {
+  const settings = useApp((x) => x.folded.settings);
+  return (
+    <Sheet title="System print test" onClose={onClose}>
+      <div className={ps.paper}>
+        <h2>{settings.stallName || 'POS PRINT TEST'}</h2>
+        {settings.eventName ? <p>{settings.eventName}</p> : null}
+        {settings.address ? <p>{settings.address}</p> : null}
+        {settings.contact ? <p>{settings.contact}</p> : null}
+        <div className={ps.paperRule} />
+        <p>TEST RECEIPT · #0001</p>
+        <div className={ps.paperRule} />
+        <div className={ps.paperTotal}><span>Print check</span><span>₹1.00</span></div>
+        <div className={ps.paperRule} />
+        <p>Printer dialogue and page layout check</p>
+        <p>No real order or customer information</p>
+      </div>
+      <button type="button" className={ps.printBtn} onClick={() => { window.print(); }}>Open system print / AirPrint</button>
     </Sheet>
   );
 }
@@ -211,7 +237,8 @@ function PrinterSettings() {
         <button type="button" className={kit.quiet} disabled={!canUsbPrint() || busy} onClick={() => { void selectUsb(); }}>Select USB</button>
       </div>
       <div className={kit.row}>
-        <button type="button" className={kit.cta} disabled={!printer || busy} onClick={() => { void test(); }}>{busy ? 'Working…' : 'Test printer'}</button>
+        <button type="button" className={kit.cta} disabled={!printer || busy} onClick={() => { void test(); }}>{busy ? 'Working…' : 'Test direct printer'}</button>
+        <button type="button" className={kit.quiet} onClick={() => setSystemTest(true)}>Test AirPrint / system print</button>
         <span className={kit.grow} />
       </div>
       {!canBluetoothPrint() || !canUsbPrint() ? <p className={kit.hint}>This browser does not expose every direct printer connection. On iPad, use the system Print sheet with an AirPrint-compatible printer.</p> : null}
