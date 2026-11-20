@@ -85,8 +85,19 @@ function makeImageBlock(file: File, paperWidth: 58 | 80): Promise<ReceiptBlock> 
         context.fillStyle = '#fff';
         context.fillRect(0, 0, width, height);
         context.drawImage(image, 0, 0, width, height);
+        // Thermal heads are monochrome. Quantise the upload before storing it so the template
+        // stays small enough to sync through a single Sheet operation.
+        const pixels = context.getImageData(0, 0, width, height);
+        for (let i = 0; i < pixels.data.length; i += 4) {
+          const grey = 0.299 * (pixels.data[i] ?? 255) + 0.587 * (pixels.data[i + 1] ?? 255) + 0.114 * (pixels.data[i + 2] ?? 255);
+          const bit = grey < 180 ? 0 : 255;
+          pixels.data[i] = bit; pixels.data[i + 1] = bit; pixels.data[i + 2] = bit; pixels.data[i + 3] = 255;
+        }
+        context.putImageData(pixels, 0, 0);
         try {
-          resolve({ id: crypto.randomUUID(), type: 'image', dataUrl: canvas.toDataURL('image/png'), widthDots: width });
+          const dataUrl = canvas.toDataURL('image/png');
+          if (dataUrl.length > 40_000) { reject(new Error('That image is still too large. Choose a simpler, smaller logo.')); return; }
+          resolve({ id: crypto.randomUUID(), type: 'image', dataUrl, widthDots: width });
         } catch { reject(new Error('Could not prepare that image')); }
       };
       image.src = String(reader.result ?? '');
@@ -115,6 +126,7 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
   };
   const addImage = async (file: File | undefined) => {
     if (!file) return;
+    if (template.blocks.some((b) => b.type === 'image')) { setError('The template can contain one logo image. Remove the existing image first.'); return; }
     try { const image = await makeImageBlock(file, template.paperWidth); update([...template.blocks, image]); setError(''); }
     catch (e) { setError(e instanceof Error ? e.message : 'Image could not be added'); }
   };
@@ -148,14 +160,46 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
       <div className={kit.field}>
         <span className={kit.fieldLab}>Template order · move blocks to arrange</span>
         {template.blocks.map((block, index) => (
-          <div key={block.id} className={kit.row}>
-            <span className={kit.grow}>{labelFor(block)}</span>
-            <button type="button" className={kit.quiet} aria-label={`Move ${labelFor(block)} up`} disabled={index === 0}
-              onClick={() => update(moveReceiptBlock(template.blocks, index, -1))}>↑</button>
-            <button type="button" className={kit.quiet} aria-label={`Move ${labelFor(block)} down`} disabled={index === template.blocks.length - 1}
-              onClick={() => update(moveReceiptBlock(template.blocks, index, 1))}>↓</button>
-            <button type="button" className={kit.danger} aria-label={`Remove ${labelFor(block)}`}
-              onClick={() => update(template.blocks.filter((x) => x.id !== block.id))}>×</button>
+          <div key={block.id} className={kit.field} style={{ borderBottom: '1px solid var(--dl-color-hairline)', paddingBottom: '0.5rem' }}>
+            <div className={kit.row}>
+              <strong className={kit.grow}>{labelFor(block)}</strong>
+              <button type="button" className={kit.quiet} aria-label={`Move ${labelFor(block)} up`} disabled={index === 0}
+                onClick={() => update(moveReceiptBlock(template.blocks, index, -1))}>↑</button>
+              <button type="button" className={kit.quiet} aria-label={`Move ${labelFor(block)} down`} disabled={index === template.blocks.length - 1}
+                onClick={() => update(moveReceiptBlock(template.blocks, index, 1))}>↓</button>
+              <button type="button" className={kit.danger} aria-label={`Remove ${labelFor(block)}`}
+                onClick={() => update(template.blocks.filter((x) => x.id !== block.id))}>×</button>
+            </div>
+            {block.type === 'text' ? (
+              <input className={kit.input} aria-label="Custom receipt text" value={block.text}
+                onChange={(e) => update(template.blocks.map((x) => x.id === block.id && x.type === 'text' ? { ...x, text: e.target.value } : x))} />
+            ) : null}
+            {block.type === 'variable' ? (
+              <select className={kit.input} aria-label="Receipt variable" value={block.key}
+                onChange={(e) => update(template.blocks.map((x) => x.id === block.id && x.type === 'variable' ? { ...x, key: e.target.value as (typeof PRINT_VARIABLES)[number][0] } : x))}>
+                {PRINT_VARIABLES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              </select>
+            ) : null}
+            {block.type === 'variable' || block.type === 'text' ? (
+              <>
+                <div className={kit.row}>
+                  <label className={kit.grow}>Alignment
+                    <select className={kit.input} value={block.align ?? 'left'} onChange={(e) => update(template.blocks.map((x) =>
+                      x.id === block.id && (x.type === 'variable' || x.type === 'text') ? { ...x, align: e.target.value as 'left' | 'center' | 'right' } : x))}>
+                      <option value="left">Left</option><option value="center">Centre</option><option value="right">Right</option>
+                    </select>
+                  </label>
+                  <label className={kit.grow}><input type="checkbox" checked={block.bold ?? false} onChange={(e) => update(template.blocks.map((x) =>
+                    x.id === block.id && (x.type === 'variable' || x.type === 'text') ? { ...x, bold: e.target.checked } : x))} /> Bold
+                  </label>
+                </div>
+                {block.type === 'variable' ? (
+                  <label className={kit.row}><input type="checkbox" checked={block.large ?? false} onChange={(e) => update(template.blocks.map((x) =>
+                    x.id === block.id && x.type === 'variable' ? { ...x, large: e.target.checked } : x))} /> Large text
+                  </label>
+                ) : null}
+              </>
+            ) : null}
           </div>
         ))}
       </div>
