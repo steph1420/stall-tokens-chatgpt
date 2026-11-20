@@ -9,6 +9,7 @@ import {
 } from '../../store';
 import s from './TokenSlip.module.css';
 
+// eslint-disable-next-line max-lines-per-function -- assemble one consistent immutable receipt context for both print targets.
 function useReceipt(o: Order, draftTip?: Paise, draftWaived?: Paise) {
   const settings = useApp((x) => x.folded.settings);
   const items = useApp((x) => x.folded.items);
@@ -65,8 +66,8 @@ function useReceipt(o: Order, draftTip?: Paise, draftWaived?: Paise) {
 async function imageToRaster(row: Extract<ReceiptRow, { type: 'image' }>): Promise<RasterRow> {
   const image = new Image();
   await new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve();
-    image.onerror = () => reject(new Error('A receipt image could not be decoded'));
+    image.onload = () => { resolve(); };
+    image.onerror = () => { reject(new Error('A receipt image could not be decoded')); };
     image.src = row.dataUrl;
   });
   const scale = Math.min(1, row.widthDots / image.naturalWidth, 256 / image.naturalHeight);
@@ -91,7 +92,7 @@ async function prepareRows(rows: readonly ReceiptRow[]): Promise<PrintableRow[]>
 
 function ReceiptBody({ rows, paperWidth }: { rows: readonly ReceiptRow[]; paperWidth: 58 | 80 }) {
   return (
-    <div className={s.slip} aria-label="Receipt preview" style={{ width: paperWidth + 'mm' }}>
+    <div className={s.slip} aria-label="Receipt preview" style={{ width: `${String(paperWidth)}mm` }}>
       {rows.map((row, index) => row.type === 'divider'
         ? <div className={s.rule} key={index}>-----------------------------------------------</div>
         : row.type === 'image'
@@ -118,11 +119,11 @@ export function TokenSlipPrint({ o, tip, waived, onDone }: { o: Order; tip?: Pai
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   useEffect(() => {
-    const after = () => onDone();
+    const after = () => { onDone(); };
     window.addEventListener('afterprint', after);
-    return () => window.removeEventListener('afterprint', after);
+    return () => { window.removeEventListener('afterprint', after); };
   }, [onDone]);
-  const systemPrint = () => window.print();
+  const systemPrint = () => { window.print(); };
   const directPrint = async () => {
     if (!printer) return;
     setBusy(true);
