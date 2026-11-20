@@ -53,3 +53,21 @@ export function stations(rows: Rows): Station[] {
 }
 /** Active stations only (launch tiles, kitchen pills; PK-6). */
 export const activeStations = (rows: Rows): Station[] => stations(rows).filter((x) => x.active);
+
+/** Customer-facing price for one menu unit, after default item discount and selected option adjustments. */
+export function menuUnitPrice(item: Pick<Item, 'price'> & Partial<Pick<Item, 'discountKind' | 'discountValue' | 'addons' | 'variants'>>, variantId?: string, addonIds: readonly string[] = []): number | null {
+  const variants = item.variants ?? [];
+  const addons = item.addons ?? [];
+  const variant = variantId ? variants.find((x) => x.id === variantId) : undefined;
+  if (variants.length > 0 && !variant) return null;
+  if (variantId && !variant) return null;
+  const selected = addonIds.map((id) => addons.find((x) => x.id === id));
+  if (selected.some((x) => x === undefined)) return null;
+  let price = item.price;
+  const discount = Math.max(0, item.discountValue ?? 0);
+  if (item.discountKind === 'pct') price -= Math.round((price * Math.min(100, discount)) / 100);
+  else if (item.discountKind === 'amount') price -= discount;
+  price += variant?.priceDelta ?? 0;
+  for (const addon of selected) price += addon?.priceDelta ?? 0;
+  return Math.max(0, Math.trunc(price));
+}
