@@ -1,0 +1,31 @@
+/* s127a / s127b take-over (locked 17 Nov 2026). 44px+ actions; at 200% text the card scrolls and the actions stay in reach. */
+.wrap {
+  position: absolute; inset: 0; z-index: var(--dl-z-sheet); display: grid; place-items: end center;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--dl-color-bg) 55%, transparent); backdrop-filter: blur(0.25rem);
+}
+.card {
+  width: 100%; max-width: 30rem; max-height: 100%; overflow-y: auto; padding: 1.25rem; font-size: 1rem; border-radius: var(--dl-radius-lg);
+  display: flex; flex-direction: column; gap: 0.5rem;
+  background: var(--dl-color-surface-raised); box-shadow: var(--dl-stall-pop), inset 0 0 0 var(--dl-stall-hair) var(--dl-color-hairline);
+}
+.title { margin: 0; font-family: var(--dl-stall-font-display); font-size: 1.25rem; font-weight: 700; color: var(--dl-color-text-display); overflow-wrap: anywhere; }
+.lead { margin: 0; font-size: 0.9375rem; color: var(--dl-color-text); }
+.sub { margin: 0; font-size: 0.875rem; color: var(--dl-color-text-muted); }
+.warn { margin: 0.25rem 0 0; padding: 0.5rem 0.75rem; border-radius: var(--dl-radius-sm); font-size: 0.875rem; color: var(--dl-stall-warn-text); background: var(--dl-chip-warning-bg); }
+.check {
+  margin-top: 0.5rem; min-height: var(--dl-hit-stage); border-radius: var(--dl-radius-md); font-size: 1.0625rem; font-weight: 700;
+  color: var(--dl-color-accent); background: color-mix(in srgb, var(--dl-color-accent) 12%, transparent);
+  box-shadow: inset 0 0 0 var(--dl-stall-hair) color-mix(in srgb, var(--dl-color-accent) 40%, transparent);
+}
+.acts { display: flex; flex-wrap: wrap; gap: var(--dl-hit-gap); margin-top: 0.25rem; }
+.acts > button { flex: 1 1 7rem; min-height: var(--dl-hit-comfortable); }
+.acts > button:first-child { flex-basis: 100%; }
+.banner {
+  flex: none; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0.5rem 1.25rem; color: var(--dl-stall-warn-text); background: var(--dl-chip-warning-bg);
+  border-bottom: var(--dl-stall-hair) solid var(--dl-chip-warning-border);
+}
+.banner span { display: flex; flex-direction: column; }
+.banner small { font-size: 0.8125rem; opacity: 0.85; }
+.bannerBtn { min-height: var(--dl-hit-min); padding: 0 1rem; border-radius: var(--dl-radius-pill); font-weight: 700; color: var(--dl-stall-on-cta); background: var(--dl-stall-cta); }
