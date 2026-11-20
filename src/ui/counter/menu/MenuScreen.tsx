@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { CONFIG } from '../../../config';
 import type { Item } from '../../../contract';
-import { bill, useApp, type Folded } from '../../../store';
+import { bill, cats, useApp, type Folded } from '../../../store';
 import { Icon } from '../../kit/Icon';
 import { usePress } from '../../kit/hold';
 import { Money } from '../../kit/Money';
@@ -25,7 +25,14 @@ function Card({ it }: { it: Item }) {
   const left = useApp((st) => (it.count === null ? Number.POSITIVE_INFINITY : st.counter.available(it.id)));
   const badge = stockLabel(it, left);
   const out = badge?.tone === 'out';
-  const press = usePress(() => { c.addItem(it.id); }, () => { openSheet({ kind: 'stock', itemId: it.id }); });
+  const add = () => {
+    if ((it.variants?.length ?? 0) > 0 || (it.addons?.length ?? 0) > 0) openSheet({ kind: 'menuOptions', itemId: it.id });
+    else c.addItem(it.id);
+  };
+  const press = usePress(add, () => { openSheet({ kind: 'stock', itemId: it.id }); });
+  const availablePrices = (it.variants?.length ? it.variants.map((v) => cats.menuUnitPrice(it, v.id, [])) : [cats.menuUnitPrice(it)])
+    .filter((p): p is number => p !== null);
+  const displayPrice = availablePrices.length ? Math.min(...availablePrices) : it.price;
   const noteLine = [...mine].reverse().find((l) => l.status === 'draft') ?? mine[mine.length - 1];
   const cls = [s.card, qty > 0 ? s.isIn : '', out ? s.isOut : ''].join(' ');
   return (
@@ -38,13 +45,15 @@ function Card({ it }: { it: Item }) {
         <button type="button" className={note ? s.pencilHas : s.pencil} aria-label={note ? 'Edit note' : 'Add note'}
           onClick={() => { openSheet({ kind: 'lineNote', lineId: noteLine.lineId }); }}><Icon name="pencil" /></button>
       ) : null}
-      <Money p={it.price} className={s.price} />
+      <Money p={displayPrice} className={s.price} />
+      {it.unit ? <span className={s.unit}>{it.unit}</span> : null}
+      {(it.variants?.length ?? 0) > 0 || (it.addons?.length ?? 0) > 0 ? <span className={s.options}>Customise</span> : null}
       {note ? <div className={s.snippet}>{note}</div> : null}
       {qty > 0 ? (
         <div className={s.qty}>
           <button type="button" className={s.qb} aria-label={`One less ${it.name}`} onClick={() => { c.removeItem(it.id); }}>−</button>
           <span className={s.qn} aria-live="polite">{qty}</span>
-          <button type="button" className={s.qb} aria-label={`One more ${it.name}`} onClick={() => { c.addItem(it.id); }}>+</button>
+          <button type="button" className={s.qb} aria-label={`One more ${it.name}`} onClick={add}>+</button>
         </div>
       ) : null}
     </article>
