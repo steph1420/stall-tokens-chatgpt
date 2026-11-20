@@ -75,6 +75,7 @@ function parseOptionRows(text: string, existing: readonly MenuPriceOption[] | un
   return result;
 }
 
+// eslint-disable-next-line max-lines-per-function -- all menu item fields must save as one validated catalogue update.
 function ItemSheet({ itemId }: { itemId: string | null }) {
   const close = useClose();
   const it = useApp((st) => (itemId ? st.folded.items[itemId] : undefined));
@@ -151,10 +152,10 @@ function ItemSheet({ itemId }: { itemId: string | null }) {
       <div className={k.field}>
         <label className={k.fieldLab} htmlFor="idiscount">Default item discount</label>
         <div className={k.row}>
-          <select id="idiscount" className={k.input} value={discountKind} onChange={(e) => setDiscountKind(e.target.value as 'none' | 'amount' | 'pct')}>
+          <select id="idiscount" className={k.input} value={discountKind} onChange={(e) => { setDiscountKind(e.target.value as 'none' | 'amount' | 'pct'); }}>
             <option value="none">No discount</option><option value="amount">₹ amount off</option><option value="pct">Percentage off</option>
           </select>
-          {discountKind !== 'none' ? <input className={k.input} aria-label="Item discount value" inputMode="decimal" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} placeholder={discountKind === 'pct' ? '10' : '5.00'} /> : null}
+          {discountKind !== 'none' ? <input className={k.input} aria-label="Item discount value" inputMode="decimal" value={discountValue} onChange={(e) => { setDiscountValue(e.target.value); }} placeholder={discountKind === 'pct' ? '10' : '5.00'} /> : null}
         </div>
         <span className={k.hint}>Applied to the base price before variant and add-on adjustments.</span>
       </div>
@@ -169,6 +170,7 @@ function ItemSheet({ itemId }: { itemId: string | null }) {
   );
 }
 
+// eslint-disable-next-line max-lines-per-function -- selected variant, add-ons and computed price form one focused sheet.
 function MenuOptionsSheet({ itemId }: { itemId: string }) {
   const close = useClose();
   const it = useApp((st) => st.folded.items[itemId]);
@@ -186,7 +188,7 @@ function MenuOptionsSheet({ itemId }: { itemId: string }) {
     <Sheet title={`Customise ${it.name}`} onClose={close}>
       {variants.length > 0 ? (
         <Field id="menu-variant" label="Choose a variant">
-          <select id="menu-variant" className={k.input} value={variantId} onChange={(e) => setVariantId(e.target.value)}>
+          <select id="menu-variant" className={k.input} value={variantId} onChange={(e) => { setVariantId(e.target.value); }}>
             <option value="">Choose…</option>
             {variants.map((v) => <option key={v.id} value={v.id}>{v.name}{v.priceDelta ? ` · ${formatInr(v.priceDelta, { symbol: true })}` : ''}</option>)}
           </select>
@@ -198,7 +200,7 @@ function MenuOptionsSheet({ itemId }: { itemId: string }) {
           {addons.map((addon) => (
             <label key={addon.id} className={k.row} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{addon.name}{addon.priceDelta ? ` · +${formatInr(addon.priceDelta)}` : ''}</span>
-              <input type="checkbox" checked={!!selected[addon.id]} onChange={(e) => toggle(addon.id, e.target.checked)} />
+              <input type="checkbox" checked={!!selected[addon.id]} onChange={(e) => { toggle(addon.id, e.target.checked); }} />
             </label>
           ))}
         </div>
