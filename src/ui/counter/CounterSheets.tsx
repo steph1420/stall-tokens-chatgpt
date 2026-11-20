@@ -1,7 +1,7 @@
 // Every Counter sheet, one owner (ARCHITECTURE §5). F-07 item, F-08 stock, F-09 notes, F-10/F-11 adjust, F-15 payees, F-18 refund, F-37 more.
 import { useState } from 'react';
 import { CONFIG } from '../../config';
-import { formatInr, parseRupees, type Order, type Paise } from '../../contract';
+import { formatInr, parseRupees, type MenuPriceOption, type Order, type Paise } from '../../contract';
 import { amounts, bill, cats, menuUnitPrice, useApp } from '../../store';
 import { AmountsEdit } from '../kit/AmountsEdit';
 import { Money } from '../kit/Money';
@@ -57,6 +57,24 @@ function CategoryPick({ value, cats, onPick }: { value: string; cats: readonly s
   );
 }
 
+function optionRows(options: readonly MenuPriceOption[] | undefined): string {
+  return (options ?? []).map((x) => \`\${x.name} | \${formatInr(x.priceDelta)}\`).join('\n');
+}
+function parseOptionRows(text: string, existing: readonly MenuPriceOption[] | undefined): MenuPriceOption[] | null {
+  const old = new Map((existing ?? []).map((x) => [x.name.trim().toLowerCase(), x.id]));
+  const result: MenuPriceOption[] = [];
+  for (const line of text.split(/\r?\n/).map((x) => x.trim()).filter(Boolean)) {
+    const [rawName, rawPrice = '0'] = line.split('|');
+    const name = (rawName ?? '').trim();
+    const amountText = rawPrice.trim().replace(/^[-+]/, '');
+    const amount = parseRupees(amountText || '0');
+    if (!name || amount === null) return null;
+    const delta = rawPrice.trim().startsWith('-') ? -amount : amount;
+    result.push({ id: old.get(name.toLowerCase()) ?? crypto.randomUUID(), name, priceDelta: delta });
+  }
+  return result;
+}
+
 function ItemSheet({ itemId }: { itemId: string | null }) {
   const close = useClose();
   const it = useApp((st) => (itemId ? st.folded.items[itemId] : undefined));
@@ -69,35 +87,87 @@ function ItemSheet({ itemId }: { itemId: string | null }) {
   const [category, setCategory] = useState(it?.category ?? cats[0] ?? '');
   const [station, setStation] = useState(it?.stationId ?? CONFIG.stations[0]);
   const [count, setCount] = useState(it?.count == null ? '' : String(it.count));
+  const [unit, setUnit] = useState(it?.unit ?? '');
+  const [secondaryUnit, setSecondaryUnit] = useState(it?.secondaryUnit ?? '');
+  const [unitsPerPrimary, setUnitsPerPrimary] = useState(String(it?.secondaryUnitsPerPrimary ?? 1));
+  const [addonsText, setAddonsText] = useState(optionRows(it?.addons));
+  const [variantsText, setVariantsText] = useState(optionRows(it?.variants));
+  const [discountKind, setDiscountKind] = useState<'none' | 'amount' | 'pct'>(it?.discountKind ?? 'none');
+  const [discountValue, setDiscountValue] = useState(it?.discountKind === 'amount' ? String((it.discountValue ?? 0) / R) : String(it?.discountValue ?? 0));
   const [err, setErr] = useState('');
   const save = () => {
     const p = parseRupees(price);
     if (p === null) { setErr('Check the price'); return; }
     const n = count.trim() === '' ? null : Number(count);
-    if (n !== null && !Number.isSafeInteger(n)) { setErr('Stock must be a whole number'); return; }
-    const e = cat.saveItem(itemId, { name, price: p, swatch, category, stationId: station, count: n });
+    if (n !== null && (!Number.isSafeInteger(n) || n < 0)) { setErr('Stock must be a whole number'); return; }
+    const conversion = Number(unitsPerPrimary);
+    if (secondaryUnit.trim() && (!Number.isSafeInteger(conversion) || conversion < 1)) { setErr('Enter a whole-number unit conversion'); return; }
+    const addons = parseOptionRows(addonsText, it?.addons);
+    const variants = parseOptionRows(variantsText, it?.variants);
+    if (addons === null || variants === null) { setErr('Use one option per line: Name | price adjustment (₹)'); return; }
+    let discount = 0;
+    if (discountKind === 'amount') {
+      const parsed = parseRupees(discountValue);
+      if (parsed === null) { setErr('Check the item discount'); return; }
+      discount = parsed;
+    } else if (discountKind === 'pct') {
+      if (!/^\d{1,3}$/.test(discountValue) || Number(discountValue) > 100) { setErr('Discount percentage must be between 0 and 100'); return; }
+      discount = Number(discountValue);
+    }
+    const e = cat.saveItem(itemId, {
+      name, price: p, swatch, category, stationId: station, count: n,
+      unit: unit.trim(), secondaryUnit: secondaryUnit.trim(), secondaryUnitsPerPrimary: secondaryUnit.trim() ? conversion : 1,
+      addons, variants, discountKind, discountValue: discount,
+    });
     if (e) setErr(e); else close();
   };
   return (
-    <Sheet title={it ? 'Edit item' : 'Add item'} onClose={close}>
-      <Field id="iname" label="Name"><input id="iname" className={k.input} value={name} maxLength={CONFIG.limits.nameMaxChars} onChange={(e) => { setName(e.target.value); }} autoComplete="off" /></Field>
-      <Field id="iprice" label="Price (₹)"><input id="iprice" className={k.input} value={price} inputMode="decimal" onChange={(e) => { setPrice(e.target.value); }} /></Field>
+    <Sheet title={it ? 'Edit menu item' : 'Add menu item'} onClose={close}>
+      <Field id="iname" label="Item name"><input id="iname" className={k.input} value={name} maxLength={CONFIG.limits.nameMaxChars} onChange={(e) => { setName(e.target.value); }} autoComplete="off" /></Field>
+      <Field id="iprice" label="Base price (₹)"><input id="iprice" className={k.input} value={price} inputMode="decimal" onChange={(e) => { setPrice(e.target.value); }} /></Field>
       <Swatches value={swatch} onPick={setSwatch} />
       <CategoryPick value={category} cats={cats} onPick={(c) => { setCategory(c); if (!it) setStation(stationFor(c) ?? station); }} />
-      <Field id="istation" label="Station"><select id="istation" className={k.input} value={station} onChange={(e) => { setStation(e.target.value); }}>
+      <Field id="istation" label="Kitchen station"><select id="istation" className={k.input} value={station} onChange={(e) => { setStation(e.target.value); }}>
         {CONFIG.stations.map((x) => <option key={x} value={x}>{x}</option>)}</select></Field>
       <Field id="icount" label="Stock (leave empty for no count)"><input id="icount" className={k.input} value={count} inputMode="numeric" onChange={(e) => { setCount(e.target.value.replace(/[^\d]/g, '')); }} /></Field>
+      <div className={k.field}>
+        <label className={k.fieldLab} htmlFor="iunit">Primary unit</label>
+        <input id="iunit" className={k.input} value={unit} maxLength={20} placeholder="e.g. plate, piece, glass" onChange={(e) => { setUnit(e.target.value); }} />
+      </div>
+      <div className={k.field}>
+        <label className={k.fieldLab} htmlFor="isecondary">Secondary unit (optional)</label>
+        <input id="isecondary" className={k.input} value={secondaryUnit} maxLength={20} placeholder="e.g. pieces, ml, grams" onChange={(e) => { setSecondaryUnit(e.target.value); }} />
+        {secondaryUnit.trim() ? <input className={k.input} aria-label="Secondary units per primary unit" inputMode="numeric" value={unitsPerPrimary} onChange={(e) => { setUnitsPerPrimary(e.target.value.replace(/[^\d]/g, '')); }} placeholder="How many per primary unit?" /> : null}
+        <span className={k.hint}>Example: 1 bottle = 750 ml. This is a label and conversion for menu/stock display.</span>
+      </div>
+      <div className={k.field}>
+        <label className={k.fieldLab} htmlFor="ivariants">Variants · one per line: Name | price adjustment (₹)</label>
+        <textarea id="ivariants" className={[k.input, k.textarea].join(' ')} rows={3} value={variantsText} onChange={(e) => { setVariantsText(e.target.value); }} placeholder={'Regular | 0\nLarge | 20'} />
+      </div>
+      <div className={k.field}>
+        <label className={k.fieldLab} htmlFor="iaddons">Add-ons · one per line: Name | extra price (₹)</label>
+        <textarea id="iaddons" className={[k.input, k.textarea].join(' ')} rows={3} value={addonsText} onChange={(e) => { setAddonsText(e.target.value); }} placeholder={'Cheese | 20\nExtra sauce | 10'} />
+      </div>
+      <div className={k.field}>
+        <label className={k.fieldLab} htmlFor="idiscount">Default item discount</label>
+        <div className={k.row}>
+          <select id="idiscount" className={k.input} value={discountKind} onChange={(e) => setDiscountKind(e.target.value as 'none' | 'amount' | 'pct')}>
+            <option value="none">No discount</option><option value="amount">₹ amount off</option><option value="pct">Percentage off</option>
+          </select>
+          {discountKind !== 'none' ? <input className={k.input} aria-label="Item discount value" inputMode="decimal" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} placeholder={discountKind === 'pct' ? '10' : '5.00'} /> : null}
+        </div>
+        <span className={k.hint}>Applied to the base price before variant and add-on adjustments.</span>
+      </div>
       {err ? <div className={k.err} role="alert">{err}</div> : null}
       <div className={k.row}>
         {it ? <button type="button" className={k.danger} onClick={() => { cat.removeItem(it.id); close(); }}>Remove</button> : null}
         <span className={k.grow} />
         <button type="button" className={k.quiet} onClick={close}>Cancel</button>
-        <button type="button" className={k.cta} onClick={save}>Save</button>
+        <button type="button" className={k.cta} onClick={save}>Save item</button>
       </div>
     </Sheet>
   );
 }
-
 function StockSheet({ itemId }: { itemId: string }) {
   const close = useClose();
   const it = useApp((st) => st.folded.items[itemId]);
