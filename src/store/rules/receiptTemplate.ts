@@ -30,6 +30,8 @@ const variable = (id: string, key: PrintVariable, extra: Partial<Extract<Receipt
 export const DEFAULT_RECEIPT_TEMPLATE: ReceiptTemplate = {
   version: 1,
   paperWidth: 58,
+  cutPaper: false,
+  feedLines: 4,
   blocks: [
     variable('b-business', 'businessName', { align: 'center', bold: true, large: true }),
     variable('b-event', 'eventName', { align: 'center', bold: true }),
