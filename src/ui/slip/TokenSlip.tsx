@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { CONFIG } from '../../config';
 import { formatInr, type Order, type Paise } from '../../contract';
 import {
-  bill, formatToken, istClock, useApp, parseReceiptTemplate, buildReceiptRows,
+  bill, formatToken, istClock, istDay, useApp, parseReceiptTemplate, buildReceiptRows,
   selectedPrinter, printToSelectedPrinter, escposReceipt, rgbaToMonochrome,
   type ReceiptRow, type PrintableRow, type RasterRow,
 } from '../../store';
@@ -12,6 +12,7 @@ import s from './TokenSlip.module.css';
 function useReceipt(o: Order, draftTip?: Paise, draftWaived?: Paise) {
   const settings = useApp((x) => x.folded.settings);
   const items = useApp((x) => x.folded.items);
+  const servingName = useApp((x) => x.prefs.servingName);
   const template = parseReceiptTemplate(settings.printTemplate);
   const cash = o.payments.reduce((t, p) => t + p.cash, 0);
   const upi = o.payments.reduce((t, p) => t + p.upi, 0);
@@ -22,6 +23,8 @@ function useReceipt(o: Order, draftTip?: Paise, draftWaived?: Paise) {
   const discount = bill.discountAmount(subtotal, o.discount);
   const amountTotal = Math.max(0, bill.total(o) + tip - waived);
   const method = cash && upi ? 'Cash + UPI' : upi ? 'UPI' : cash ? 'Cash' : 'Not paid';
+  const at = o.payments[0]?.at ?? o.createdAt;
+  const roundOff = bill.roundOffAmount(o);
   const context = {
     values: {
       businessName: settings.stallName || 'Fair stall',
@@ -31,21 +34,25 @@ function useReceipt(o: Order, draftTip?: Paise, draftWaived?: Paise) {
       slogan: settings.slogan ?? '',
       welcomeNote: settings.welcomeNote ?? '',
       token: 'Token ' + formatToken(o.token, CONFIG.tokens.pad),
-      dateTime: istClock(o.payments[0]?.at ?? o.createdAt),
+      dateTime: `${istDay(at)} · ${istClock(at)}`,
+      servingName,
       customerName: o.client,
       orderNote: o.note,
       subtotal: formatInr(subtotal),
       discount: discount > 0 ? '−' + formatInr(discount) : '',
+      roundOff: roundOff !== 0 ? (roundOff > 0 ? '+' : '−') + formatInr(Math.abs(roundOff)) : '',
+      tip: tip > 0 ? formatInr(tip) : '',
+      waived: waived > 0 ? '−' + formatInr(waived) : '',
       total: formatInr(amountTotal),
       paymentMode: method,
       paid: formatInr(paid),
-      balance: formatInr(Math.max(0, bill.due(o) - tip + waived)),
+      balance: formatInr(Math.max(0, amountTotal - paid)),
       thankYouNote: settings.thankYouNote ?? '',
     },
     items: o.lines.filter((l) => l.qty > 0).map((l) => ({
       name: l.name,
       quantity: l.qty,
-      unit: l.unit ?? items[l.itemId]?.unit ?? '',
+      unit: l.unit ? `${l.unit}${l.secondaryUnit ? ` (${String(l.secondaryUnitsPerPrimary ?? 1)} ${l.secondaryUnit})` : ''}` : items[l.itemId]?.unit ?? '',
       rate: formatInr(l.price),
       amount: formatInr(l.price * l.qty),
       note: l.note,
