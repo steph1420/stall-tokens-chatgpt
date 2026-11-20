@@ -1,0 +1,26 @@
+/* Global base. Tokens only (06 rule 3): no raw colours, px or timings. */
+@import '../tokens/tokens.css';
+@import '../tokens/stall.tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+html { text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+html, body, body > div { height: 100%; }
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--dl-stall-font-display);
+  font-size: var(--dl-type-body-size);
+  line-height: var(--dl-type-body-line);
+  color: var(--dl-color-text);
+  background: var(--dl-stall-bg-art), var(--dl-color-bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; }
+button:disabled { cursor: default; }
+input, textarea, select { font: inherit; }
+:focus-visible { outline: medium solid var(--dl-color-focus); outline-offset: var(--dl-space-1); border-radius: var(--dl-radius-sm); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: var(--dl-dur-quick); animation: none; }
+}
