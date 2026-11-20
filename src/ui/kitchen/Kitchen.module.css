@@ -1,0 +1,170 @@
+/* Kitchen (21-polish2/kitchen.html + polish2.css v4 pills). Sizes from the mockup in rem (16 px = 1 rem). */
+.phone { composes: phone from "../counter/Counter.module.css"; }
+.wide { composes: wide from "../counter/Counter.module.css"; }
+.chrome { composes: chrome from "../counter/Counter.module.css"; }
+.hdr { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: 1rem 2.25rem; column-gap: 0.5rem; row-gap: 0.25rem; align-items: center; padding: 0.25rem 1rem 0 0.75rem; }
+.kicker { grid-column: 1 / span 3; grid-row: 1; padding-left: 0.5rem; font-size: 0.6875rem; line-height: 1rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dl-color-text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.back { grid-column: 1; grid-row: 2; width: var(--dl-hit-min); height: var(--dl-hit-min); display: grid; place-items: center; color: var(--dl-color-accent); }
+.back svg { width: 1.375rem; height: 1.375rem; display: block; }
+.title { grid-column: 2; grid-row: 2; margin: 0; font-family: var(--dl-stall-font-display); font-size: 1.0625rem; font-weight: 500; letter-spacing: -0.01em; color: var(--dl-color-text-display); }
+.open {
+  grid-column: 3; grid-row: 2; min-height: var(--dl-hit-min); padding: 0 0.625rem 0 0.75rem; border-radius: var(--dl-radius-pill);
+  display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500; line-height: 1;
+  color: var(--dl-color-accent); background: color-mix(in srgb, var(--dl-color-accent) 10%, transparent);
+}
+.openIc svg { width: 0.875rem; height: 0.875rem; display: block; }
+
+/* Station pills (Q-PILLS-1 A): one horizontally scrolling row, soft right fade. */
+.pills {
+  display: flex; align-items: stretch; gap: 0.625rem; overflow-x: auto; scrollbar-width: none; margin: 0.5rem 0 0.375rem; padding: 0.125rem 1.75rem 0.375rem 1rem;
+  mask-image: linear-gradient(90deg, var(--dl-stall-qr-ink) 0, var(--dl-stall-qr-ink) calc(100% - 2.25rem), transparent 100%);
+}
+.pills::-webkit-scrollbar { display: none; }
+.pill {
+  --c: var(--dl-color-accent);
+  flex: none; height: var(--dl-stall-pill-h); min-width: 6rem; padding: 0 1.125rem 0 0.875rem; gap: 0.75rem; border-radius: 1.375rem;
+  display: flex; align-items: center; font-size: 1rem; color: var(--dl-color-text-muted);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+}
+.pillAll { --c: var(--dl-color-accent); }
+.pillIcon svg { width: 1.75rem; height: 1.75rem; display: block; stroke: color-mix(in srgb, var(--c) 75%, transparent); opacity: 0.8; }
+.pillTx { display: flex; flex-direction: column; gap: 0.375rem; align-items: flex-start; line-height: 1; }
+.pillTx span { font-weight: 500; }
+.pillTx b { font-size: 0.9375rem; font-weight: 500; color: var(--c); font-variant-numeric: tabular-nums; }
+.pillZero .pillTx b { opacity: 0.45; }
+.pillOn { background: color-mix(in srgb, var(--c) 30%, transparent); color: var(--dl-color-text-display); }
+.pillOn .pillIcon svg { opacity: 1; stroke: var(--c); }
+.pillOn .pillTx b { color: var(--dl-color-text-display); }
+:global([data-theme="stall-day"]) .pill:not(.pillOn) .pillTx b { color: color-mix(in srgb, var(--c) 50%, var(--dl-color-text-display)); }
+
+/* Order cards */
+.klist { flex: 1; min-height: 0; overflow-y: auto; padding: 0.5rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.empty { margin: 3rem 0 0; text-align: center; color: var(--dl-color-text-muted); font-size: 1rem; line-height: 1.5; }
+.kcard {
+  position: relative; flex: none; padding: 0.875rem 1rem 0.75rem; border-radius: var(--dl-card-radius);
+  background: var(--dl-card-bg); backdrop-filter: blur(var(--dl-blur-card)) saturate(160%);
+  box-shadow: inset 0 0 0 var(--dl-stall-hair) var(--dl-card-border), var(--dl-stall-card-edge), var(--dl-stall-card-lift);
+  overflow: hidden; isolation: isolate;
+}
+.kcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--dl-color-sheen); pointer-events: none; z-index: 1; }
+.isPriority {
+  background: color-mix(in srgb, var(--dl-color-accent) 10%, var(--dl-color-surface));
+  box-shadow: inset 0 0 0 var(--dl-stall-hair) var(--dl-card-border), var(--dl-stall-card-edge), 0 0 1rem color-mix(in srgb, var(--dl-color-accent) 14%, transparent);
+}
+.isPaused { opacity: 0.5; }
+.kh { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.625rem; margin-bottom: 0.375rem; }
+.token {
+  font-family: var(--dl-stall-font-display); font-weight: var(--dl-stall-num-weight); font-size: 2rem; line-height: 1; letter-spacing: -0.04em;
+  color: var(--dl-color-text-display); font-variant-numeric: tabular-nums; text-shadow: 0 0 1rem color-mix(in srgb, var(--dl-color-accent) 18%, transparent);
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.hash { font-size: 0.62em; margin-right: 0.0625rem; opacity: 0.8; }
+.meta { font-size: 0.875rem; color: var(--dl-color-text-muted); text-align: right; }
+
+.kline {
+  --c: var(--dl-color-accent);
+  position: relative; z-index: 2; display: flex; align-items: center; gap: 0.5rem; min-height: var(--dl-hit-min); padding: 0.5rem 0.25rem; gap: 0.75rem; border-radius: 0.625rem;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; cursor: pointer;
+}
+.kline + .kline { margin-top: 0.125rem; }
+/* s124: one colour dot per line (its station). */
+.bar { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0.375rem color-mix(in srgb, var(--c) 40%, transparent); }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.name { font-family: var(--dl-stall-font-display); font-size: 1.125rem; line-height: 1.375rem; font-weight: 500; letter-spacing: -0.02em; color: var(--dl-color-text); }
+/* W-26: a line note is a request (text colour, pencil), never mistaken for the station chip. */
+.note { margin-top: 0.125rem; font-size: 0.9375rem; line-height: 1.25rem; color: var(--dl-color-text); overflow-wrap: anywhere; }
+.note::before { content: "✎ "; color: var(--dl-color-text-muted); }
+.chip { align-self: flex-start; margin-top: 0.125rem; font-size: 0.75rem; font-weight: 600; line-height: 1rem; color: color-mix(in srgb, var(--c) 80%, var(--dl-color-text)); }
+.state { flex: none; display: flex; align-items: center; line-height: 1.625rem; }
+.isHanded .main, .isHanded .bar { opacity: 0.45; }
+.isDone { background: color-mix(in srgb, var(--dl-color-warning) 12%, transparent); box-shadow: 0 0 0.875rem color-mix(in srgb, var(--dl-color-warning) 10%, transparent); }
+.isOther { cursor: default; }
+.isOther .main, .isOther .bar, .isOther .state { opacity: 0.5; }
+
+/* Status marks (Q-ICON) */
+.st { --st: var(--dl-color-text-muted); display: inline-flex; align-items: center; gap: 0.375rem; color: var(--st); }
+.stIcon svg { width: 1.625rem; height: 1.625rem; display: block; filter: drop-shadow(0 0 0.375rem color-mix(in srgb, var(--st) 35%, transparent)); }
+.stIconSm svg { width: 1.375rem; height: 1.375rem; display: block; filter: drop-shadow(0 0 0.375rem color-mix(in srgb, var(--st) 35%, transparent)); }
+.stBob { display: inline-block; }
+.stL { font-size: 0.8125rem; color: var(--dl-color-text-muted); }
+.stWaiting { --st: var(--dl-stall-st-waiting); }
+.stPreparing { --st: var(--dl-stall-st-preparing); }
+.stDone { --st: var(--dl-stall-st-done); }
+.stReady { --st: var(--dl-stall-st-ready); }
+.stHeld { --st: var(--dl-stall-st-held); }
+.stHanded { --st: var(--dl-stall-st-handed); }
+.stPaused { --st: var(--dl-stall-st-paused); }
+.stPriority { --st: var(--dl-stall-st-priority); }
+.hint { font-size: 0.8125rem; color: var(--dl-color-text-faint); }
+/* Q-COUNTER-FINISH: finished by the Counter, muted with the Ready icon. */
+.isCounter .main, .isCounter .bar { opacity: 0.5; }
+/* Q-OVERLAY (revised 17:50): rounded frosted veil at the card radius with a centred circle badge; no outlines. */
+.leaving { position: relative; flex: none; border-radius: var(--leave-r, var(--dl-card-radius)); }
+.veil {
+  --veil-c: var(--dl-stall-veil-done);
+  position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; overflow: hidden;
+  border-radius: var(--leave-r, var(--dl-card-radius));
+  background: color-mix(in srgb, var(--veil-c) 8%, color-mix(in srgb, var(--dl-color-surface-solid) 70%, transparent));
+  backdrop-filter: blur(0.375rem) saturate(140%);
+}
+.veilCancel { --veil-c: var(--dl-stall-veil-cancel); }
+/* PK-10 W-37: done here, still open at other stations (quiet). */
+.veilHanded { --veil-c: var(--dl-stall-st-handed); }
+.veilBadge { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.veilDot {
+  width: 3.25rem; height: 3.25rem; border-radius: 50%; display: grid; place-items: center;
+  color: var(--dl-stall-on-veil); background: var(--veil-c);
+  box-shadow: 0 0.375rem 1.25rem color-mix(in srgb, var(--veil-c) 40%, transparent);
+}
+.veilIc { width: 1.625rem; height: 1.625rem; }
+.veilTx { font-size: 1rem; font-weight: 600; color: var(--dl-color-text); letter-spacing: -0.01em; }
+
+/* P3 PK-2 ticket header (s117 facts, s124 layout): token (hold for Priority, ≥ 44 px), age, who, Unpaid; note strip. */
+.tokHold { display: inline-flex; align-items: center; min-height: var(--dl-hit-min); min-width: var(--dl-hit-min); touch-action: manipulation; }
+.facts { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.625rem; row-gap: 0.125rem; }
+.age { font-size: 0.875rem; font-weight: 600; color: var(--dl-color-text-muted); font-variant-numeric: tabular-nums; }
+.ageAmber { color: var(--dl-stall-warn-text); }
+.ageRed { color: var(--dl-color-danger); }
+.who { font-size: 0.9375rem; font-weight: 600; color: var(--dl-color-text-display); overflow-wrap: anywhere; }
+.unpaid { font-size: 0.875rem; font-weight: 600; color: var(--dl-color-danger); }
+.noteStrip {
+  position: relative; z-index: 2; margin: 0 0 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.75rem; font-size: 0.9375rem; font-weight: 600;
+  color: var(--dl-color-text); background: color-mix(in srgb, var(--dl-color-text-muted) 12%, transparent); overflow-wrap: anywhere;
+}
+.noteWarn { color: var(--dl-stall-warn-text); background: color-mix(in srgb, var(--dl-stall-warn-text) 16%, transparent); }
+.noteWarn::before { content: "⚠ "; }
+/* Q-KITCHEN-ALERT (proposal) as built, D-P3-ALERT: a new ticket glows quietly for a few seconds; no sound. */
+.isNew { box-shadow: inset 0 0 0 0.125rem color-mix(in srgb, var(--dl-color-accent) 70%, transparent), var(--dl-stall-card-edge), 0 0 1.25rem color-mix(in srgb, var(--dl-color-accent) 30%, transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .isNew { animation: newGlow var(--dl-dur-deliberate) ease-in-out 3 alternate; }
+}
+@keyframes newGlow { from { box-shadow: inset 0 0 0 0.125rem color-mix(in srgb, var(--dl-color-accent) 30%, transparent); } }
+/* 200 % text: header, pills and tickets scroll together, so the tickets are never squeezed out (see the container query). */
+.kscroll { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/* P3b (D-P3B-3): tickets in columns on a tablet; each column keeps the phone ticket width. */
+.kgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); align-items: start; align-content: start; gap: 0.75rem; }
+/* P3b: large text on a tablet (wider than the 24rem container rule): the pills wrap, text only. */
+.pillsWrap { composes: pills; flex-wrap: wrap; overflow-x: visible; mask-image: none; padding-right: 1rem; gap: 0.5rem; }
+.pillsWrap .pill { min-width: 0; height: auto; min-height: var(--dl-hit-min); padding: 0.375rem 0.75rem; flex: 1 1 auto; }
+.pillsWrap .pillIcon { display: none; }
+.pillsWrap .pillTx { flex-direction: row; gap: 0.5rem; align-items: baseline; }
+/* W-41 / W-28: taps rest for a moment after the list reorders under the finger. */
+.guard { pointer-events: none; }
+/* 200 % text and narrow phones: the pill row wraps instead of running off-screen (rem-based, so large text triggers it). */
+@container counter (max-width: 24rem) {
+  .kscroll { overflow-y: auto; }
+  .kscroll .klist { flex: none; overflow: visible; }
+  .pills { flex-wrap: wrap; overflow-x: visible; mask-image: none; padding-right: 1rem; gap: 0.5rem; }
+  .pill { min-width: 0; height: auto; min-height: var(--dl-hit-min); padding: 0.375rem 0.75rem; flex: 1 1 auto; }
+  .pillIcon { display: none; }
+  .pillTx { flex-direction: row; gap: 0.5rem; align-items: baseline; }
+  .hdr { grid-template-rows: auto auto auto; }
+  .open { grid-column: 2 / span 2; grid-row: 3; justify-self: start; }
+}
+/* Phone on its side (W-33 part; the tablet grid is P3b): a compact header so more of the ticket shows. */
+@media (orientation: landscape) and (max-height: 30rem) {
+  .hdr { grid-template-rows: 0 var(--dl-hit-min); row-gap: 0; }
+  .kicker { display: none; }
+  .pills { margin: 0.25rem 0; }
+  .pill { height: var(--dl-hit-min); }
+}
