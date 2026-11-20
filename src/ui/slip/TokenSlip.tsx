@@ -45,7 +45,7 @@ function useReceipt(o: Order, draftTip?: Paise, draftWaived?: Paise) {
     items: o.lines.filter((l) => l.qty > 0).map((l) => ({
       name: l.name,
       quantity: l.qty,
-      unit: items[l.itemId]?.unit ?? '',
+      unit: l.unit ?? items[l.itemId]?.unit ?? '',
       rate: formatInr(l.price),
       amount: formatInr(l.price * l.qty),
       note: l.note,
