@@ -79,6 +79,13 @@
   .handover { flex: 1 1 100%; order: 1; }
   .line { flex-wrap: wrap; }
   .lineTap { flex: 1 1 100%; }
+  .headTap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "num" "time" "name" "dots"; }
+  .time { justify-self: start; padding-top: 0; }
+  .lookRow { flex-direction: column; align-items: stretch; }
+  .lookLeft { min-width: 0; width: 100%; flex-wrap: wrap; }
+  .prioBtn, .prioBtnOn { min-width: 0; max-width: 100%; flex: 1 1 auto; justify-content: center; white-space: normal; }
+  .looks { width: 100%; }
+  .look, .lookOn { flex: 1 1 0; text-align: center; }
 }
 
 .shH { display: flex; align-items: baseline; gap: 0.625rem; padding: 0 0.25rem 0.625rem; }
