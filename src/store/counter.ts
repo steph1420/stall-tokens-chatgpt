@@ -156,7 +156,8 @@ function lineActions(x: Ctx, nav: Nav) {
         orderId: o.id, lineId: core.env.makeId(), itemId, name: lineName, price: unitPrice,
         category: it.category, stationId: it.stationId, qty: 1,
         ...(variant ? { variant: variant.name } : {}), ...(addonNames.length ? { addons: addonNames } : {}),
-        ...(it.unit ? { unit: it.unit } : {}), ...(it.secondaryUnit ? { secondaryUnit: it.secondaryUnit } : {}),\n        ...(it.secondaryUnit ? { secondaryUnitsPerPrimary: it.secondaryUnitsPerPrimary ?? 1 } : {}),
+        ...(it.unit ? { unit: it.unit } : {}), ...(it.secondaryUnit ? { secondaryUnit: it.secondaryUnit } : {}),
+        ...(it.secondaryUnit ? { secondaryUnitsPerPrimary: it.secondaryUnitsPerPrimary ?? 1 } : {}),
       });
     },
     /** Menu −: take one off the newest line of this item that is not being made yet. */
