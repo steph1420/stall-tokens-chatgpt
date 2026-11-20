@@ -40,7 +40,7 @@ export * as kitchen from './rules/kitchen';
 export type { Folded } from './fold/state';
 export type { DevicePrefs, SnapshotSummary, StorageEstimate } from '../data';
 export { isSheetUrl, joinUrl, readJoin, type JoinLink, bluetoothPrint, canBluetoothPrint, canUsbPrint, selectBluetoothPrinter, selectUsbPrinter, usbPrint, printToSelectedPrinter, disconnectPrinter, selectedPrinter, testPrintBytes, type PrinterChoice, dropReceipt, getReceipt, putReceipt, receiptIds } from '../data';
-export { escposSlip, type SlipText } from './rules/escpos';
+export { escposSlip, escposReceipt, rgbaToMonochrome, escposRasterImage, type SlipText, type PrintableRow, type RasterRow } from './rules/escpos';
 export { PRINT_VARIABLES, DEFAULT_RECEIPT_TEMPLATE, parseReceiptTemplate, buildReceiptRows, moveReceiptBlock, type PrintVariable, type ReceiptBlock, type ReceiptTemplate, type ReceiptContext, type ReceiptRow, type ReceiptItem } from './rules/receiptTemplate';
 export type { OrderStatus, Page } from './rules/status';
 export * as bill from './rules/bill';
