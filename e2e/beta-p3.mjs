@@ -76,7 +76,8 @@ for (const theme of (process.env.THEMES ?? 'night,day').split(',')) {
   });
   await step(T('W-31: hold on Done? takes the line back to Preparing'), async () => {
     const tea = k.getByRole('button', { name: /^Tea: tap/ }).first();
-    await tea.click(); await k.waitForTimeout(700); await tea.click(); await k.waitForTimeout(300);
+    // W-30's Undo does not bypass the 600 ms kitchen step guard; let it expire before the first W-31 tap.
+    await k.waitForTimeout(700); await tea.click(); await k.waitForTimeout(700); await tea.click(); await k.waitForTimeout(300);
     const done = await tea.innerText();
     const box = await tea.boundingBox(); await k.mouse.move(box.x + 20, box.y + box.height / 2); await k.mouse.down(); await k.waitForTimeout(900); await k.mouse.up(); await k.waitForTimeout(250);
     const back = await tea.innerText();
