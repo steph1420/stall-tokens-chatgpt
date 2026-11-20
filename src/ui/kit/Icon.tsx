@@ -36,6 +36,7 @@ const ICONS = {
   stPaused: <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="2.2" /></svg>,
   stPriority: <svg viewBox="0 0 24 24" {...P} strokeWidth="2.1"><path d="M6 13.2 12 6.6l6 6.6" /><path d="M6 19.2 12 12.6l6 6.6" /></svg>,
   beverages: <svg viewBox="0 0 24 24" {...P} strokeWidth="1.6"><path d="M6 7h12l-1.5 13h-9z" /><path d="M13 7l2-4h3" /></svg>,
+  home: <svg viewBox="0 0 24 24" {...P} strokeWidth="1.8"><path d="m3 10 9-7 9 7" /><path d="M5.5 9.5V21h13V9.5M9.5 21v-6.5h5V21" /></svg>,
   printer: <svg viewBox="0 0 24 24" {...P} strokeWidth="1.8"><path d="M6 9V4h12v5M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="7" rx="1" /></svg>,
 } satisfies Record<string, ReactElement>;
 
