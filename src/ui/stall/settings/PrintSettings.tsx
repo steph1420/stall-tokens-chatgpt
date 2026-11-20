@@ -32,7 +32,7 @@ const sampleContext = {
     contact: '+91 98765 43210', slogan: 'Fresh. Hot. Made with care.',
     welcomeNote: 'Welcome!', token: '#024', dateTime: '21 Nov 2026 · 7:45 pm',
     customerName: 'Walk-in customer', orderNote: 'No onion',
-    subtotal: '₹240.00', discount: '₹20.00', total: '₹220.00',
+    subtotal: '₹240.00', discount: '₹20.00', roundOff: '−₹0.00', tip: '₹10.00', waived: '', total: '₹230.00',
     paymentMode: 'Paid by UPI', paid: '₹220.00', balance: '₹0.00',
     thankYouNote: 'Thank you. Visit again!',
   },
