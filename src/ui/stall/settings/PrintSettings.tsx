@@ -122,7 +122,7 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
   const addDivider = () => update([...template.blocks, { id: crypto.randomUUID(), type: 'divider' }]);
   const addItems = () => {
     if (template.blocks.some((b) => b.type === 'items')) { setError('The item list is already in the template'); return; }
-    update([...template.blocks, { id: crypto.randomUUID(), type: 'items' }]);
+    update([...template.blocks, { id: crypto.randomUUID(), type: 'items', showQty: true, showUnit: true, showRate: true, showAmount: true, showItemNote: true }]);
   };
   const addImage = async (file: File | undefined) => {
     if (!file) return;
@@ -139,6 +139,15 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
           <option value="58">58 mm</option><option value="80">80 mm</option>
         </select>
       </label>
+      <div className={kit.row}>
+        <label className={kit.grow}><input type="checkbox" checked={template.cutPaper ?? false} onChange={(e) => setTemplate((p) => ({ ...p, cutPaper: e.target.checked }))} /> Cut paper after receipt (only printers with a cutter)
+        </label>
+        <label className={kit.grow}>Feed lines
+          <select className={kit.input} value={String(template.feedLines ?? 4)} onChange={(e) => setTemplate((p) => ({ ...p, feedLines: Number(e.target.value) }))}>
+            {Array.from({ length: 11 }, (_, n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </label>
+      </div>
       <div className={kit.field}>
         <span className={kit.fieldLab}>Add a variable</span>
         <div className={kit.row}>
@@ -170,6 +179,23 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
               <button type="button" className={kit.danger} aria-label={`Remove ${labelFor(block)}`}
                 onClick={() => update(template.blocks.filter((x) => x.id !== block.id))}>×</button>
             </div>
+            {block.type === 'items' ? (
+              <div className={kit.field}>
+                {([
+                  ['showQty', 'Quantity'],
+                  ['showUnit', 'Unit'],
+                  ['showRate', 'Unit price'],
+                  ['showAmount', 'Line total'],
+                  ['showItemNote', 'Item note'],
+                ] as const).map(([key, title]) => (
+                  <label className={kit.row} key={key}>
+                    <input type="checkbox" checked={block[key] !== false} onChange={(e) => update(template.blocks.map((x) =>
+                      x.id === block.id && x.type === 'items' ? { ...x, [key]: e.target.checked } : x))} />
+                    {title}
+                  </label>
+                ))}
+              </div>
+            ) : null}
             {block.type === 'text' ? (
               <input className={kit.input} aria-label="Custom receipt text" value={block.text}
                 onChange={(e) => update(template.blocks.map((x) => x.id === block.id && x.type === 'text' ? { ...x, text: e.target.value } : x))} />
