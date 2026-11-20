@@ -3,7 +3,7 @@ export const PRINT_VARIABLES = [
   ['businessName', 'Business / bus name'], ['eventName', 'Event name'], ['address', 'Address'],
   ['contact', 'Contact number'], ['slogan', 'Slogan'], ['welcomeNote', 'Welcome note'],
   ['token', 'Token number'], ['dateTime', 'Date and time'], ['servingName', 'Served by'], ['customerName', 'Customer name'],
-  ['orderNote', 'Overall order note'], ['subtotal', 'Subtotal'], ['discount', 'Discount'], ['roundOff', 'Round-off'], ['tip', 'Tip'],
+  ['orderNote', 'Overall order note'], ['subtotal', 'Subtotal'], ['discount', 'Discount'], ['roundOff', 'Round-off'], ['tip', 'Tip'], ['waived', 'Waived amount'],
   ['total', 'Grand total'], ['paymentMode', 'Payment method'], ['paid', 'Amount paid'],
   ['balance', 'Balance due'], ['thankYouNote', 'Thank-you note'],
 ] as const;
@@ -49,6 +49,7 @@ export const DEFAULT_RECEIPT_TEMPLATE: ReceiptTemplate = {
     variable('b-discount', 'discount'),
     variable('b-roundoff', 'roundOff'),
     variable('b-tip', 'tip'),
+    variable('b-waived', 'waived'),
     variable('b-total', 'total', { bold: true, large: true }),
     variable('b-payment', 'paymentMode'),
     variable('b-paid', 'paid'),
@@ -99,7 +100,7 @@ export function buildReceiptRows(template: ReceiptTemplate, context: ReceiptCont
     const value = context.values[block.key] ?? '';
     if (!value.trim()) continue;
     const label: Partial<Record<PrintVariable, string>> = {
-      subtotal: 'Subtotal', discount: 'Discount', roundOff: 'Round-off', tip: 'Tip',
+      subtotal: 'Subtotal', discount: 'Discount', roundOff: 'Round-off', tip: 'Tip', waived: 'Waived',
       total: 'TOTAL', paid: 'Paid', balance: 'Balance',
     };
     const pairLabel = label[block.key];
