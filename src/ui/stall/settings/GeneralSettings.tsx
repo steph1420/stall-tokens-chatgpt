@@ -1,6 +1,5 @@
-// General settings: Stall name, Serving name, Token range (Q-SPLIT A, Q-SYNC-ALL).
+// General settings: business identity and this device's serving label.
 import { useState } from 'react';
-import { CONFIG } from '../../../config';
 import { useApp } from '../../../store';
 import { Sheet } from '../../kit/Sheet';
 import kit from '../../kit/kit.module.css';
@@ -21,6 +20,24 @@ function EditStallNameSheet({ onClose }: { onClose: () => void }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <input className={kit.input} placeholder="Stall name (e.g. Chai & Samosa)" value={val} onChange={(e) => { setVal(e.target.value); }} />
         <button type="button" className={kit.cta} onClick={save}>Save Stall Name</button>
+      </div>
+    </Sheet>
+  );
+}
+
+function EditEventNameSheet({ onClose }: { onClose: () => void }) {
+  const a = useApp((x) => x);
+  const [val, setVal] = useState(a.folded.settings.eventName ?? '');
+  const save = () => {
+    a.catalog.setSetting('eventName', val);
+    a.money.toast('Event name updated');
+    onClose();
+  };
+  return (
+    <Sheet title="Edit Event Name" onClose={onClose}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <input className={kit.input} placeholder="e.g. Winter Carnival" value={val} onChange={(e) => { setVal(e.target.value); }} />
+        <button type="button" className={kit.cta} onClick={save}>Save Event Name</button>
       </div>
     </Sheet>
   );
@@ -54,17 +71,21 @@ export function GeneralSettings() {
   const p = a.prefs;
   const [stallSheet, setStallSheet] = useState(false);
   const [servingSheet, setServingSheet] = useState(false);
-
-  const range = CONFIG.tokens.ranges[p.rangeIndex];
-  const rangeText = range ? `${String(range.from)}–${String(range.to)}` : '';
+  const [eventSheet, setEventSheet] = useState(false);
 
   return (
     <Group label="General">
       <Opt
-        t="Stall name"
+        t="Name of bus"
         sub="Shared with every phone"
         value={a.folded.settings.stallName || 'Not set'}
         onClick={() => { setStallSheet(true); }}
+      />
+      <Opt
+        t="Name of event"
+        sub="Printed on receipts and order slips"
+        value={a.folded.settings.eventName || 'Not set'}
+        onClick={() => { setEventSheet(true); }}
       />
       <Opt
         t="Serving name"
@@ -72,15 +93,8 @@ export function GeneralSettings() {
         value={p.servingName || 'Not set'}
         onClick={() => { setServingSheet(true); }}
       />
-      <Opt
-        t="Token range"
-        sub="Tokens restart each morning"
-        value={rangeText}
-        onClick={() => {
-          a.setPrefs({ rangeIndex: (p.rangeIndex + 1) % CONFIG.tokens.ranges.length });
-        }}
-      />
       {stallSheet ? <EditStallNameSheet onClose={() => { setStallSheet(false); }} /> : null}
+      {eventSheet ? <EditEventNameSheet onClose={() => { setEventSheet(false); }} /> : null}
       {servingSheet ? <EditServingNameSheet onClose={() => { setServingSheet(false); }} /> : null}
     </Group>
   );
