@@ -74,14 +74,15 @@ for (const theme of (process.env.THEMES ?? 'night,day').split(',')) {
     const back = await tea.innerText();
     return /Preparing/.test(after) && !/Done/.test(after) && /Waiting/.test(back) ? `"${toast.replace(/\n/g, ' ')}" → Undo → Waiting` : false;
   });
-  await step(T('W-31: hold on Done? takes the line back to Preparing'), async () => {
+  await step(T('W-31: hold on the Ready proposal takes the line back to Preparing'), async () => {
     const tea = k.getByRole('button', { name: /^Tea: tap/ }).first();
     // W-30's Undo does not bypass the 600 ms kitchen step guard; let it expire before the first W-31 tap.
     await k.waitForTimeout(700); await tea.click(); await k.waitForTimeout(700); await tea.click(); await k.waitForTimeout(300);
-    const done = await tea.innerText();
-    const box = await tea.boundingBox(); await k.mouse.move(box.x + 20, box.y + box.height / 2); await k.mouse.down(); await k.waitForTimeout(900); await k.mouse.up(); await k.waitForTimeout(250);
+    const proposedReady = await tea.innerText();
+    const box = await tea.boundingBox();
+    await k.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await k.mouse.down(); await k.waitForTimeout(900); await k.mouse.up(); await k.waitForTimeout(250);
     const back = await tea.innerText();
-    return /Done\?/.test(done) && /Preparing/.test(back) ? 'Done? → hold → Preparing' : false;
+    return /Ready/.test(proposedReady) && /Preparing/.test(back) ? 'Ready → hold → Preparing' : `before hold: "${proposedReady.replace(/\\n/g, ' ')}"; after hold: "${back.replace(/\\n/g, ' ')}"`;
   });
   await step(T('Priority: the hold target is at least 44 px; holding says "Priority on" with Undo'), async () => {
     const t = k.getByRole('button', { name: 'Hold to mark Priority' }).first();
