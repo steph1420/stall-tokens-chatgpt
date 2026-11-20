@@ -1,0 +1,122 @@
+/* Stall family extras (ADR-0003). Raw values live only in token files (06 rule 3).
+   Semantic colours come from tokens.json family "stall"; this file holds the locked
+   polish values that are not semantic colours: art, glows, CTA, fills. Source:
+   agent-common handovers/pos/assets/stall-mockups-locked/20-polish/polish.css (Q-POLISH-SET1). */
+:root {
+  --dl-stall-hair: 1px;
+  --dl-stall-hair-2: 2px;
+  --dl-stall-accent-bar: 3px;
+  --dl-stall-font-display: -apple-system, "SF Pro Display", "SF Pro Text", system-ui, "Segoe UI", Roboto, "Inter", sans-serif;
+  --dl-stall-station-0: #fb923c;
+  --dl-stall-station-1: #34d399;
+  --dl-stall-station-2: #c084fc;
+  --dl-stall-station-3: #fbbf24;
+  --dl-stall-station-4: #fb7185;
+  --dl-stall-station-5: #38bdf8;
+  --dl-stall-white: #ffffff;
+  --dl-stall-qr-ink: #000000;
+  --dl-stall-go: #30D158;
+  --dl-stall-veil-done: #30D158; /* Q-OVERLAY badge, same in night and day */
+  --dl-stall-veil-cancel: #FF453A;
+  --dl-stall-on-veil: #ffffff;
+  --dl-stall-on-go: #042016;
+  --dl-stall-on-danger: #ffffff;
+  --dl-stall-stock: #388cf8;
+  --dl-stall-on-stock: #ffffff;
+  --dl-stall-fill-cash: linear-gradient(180deg, #6fe58f, #30D158);
+  --dl-stall-fill-upi: linear-gradient(180deg, #8fdcfc, #5AC8FA);
+  --dl-stall-swatch-0: #38bdf8;
+  --dl-stall-swatch-1: #c084fc;
+  --dl-stall-swatch-2: #fbbf24;
+  --dl-stall-swatch-3: #fb7185;
+  --dl-stall-swatch-4: #45eef8;
+  --dl-stall-swatch-5: #34d399;
+  --dl-stall-swatch-6: #fb923c;
+  --dl-stall-swatch-7: #6a8bab;
+  /* Kitchen status colours (Q-ICON, 21-polish2/kitchen.html): the same in night and day; every icon carries a text label. */
+  --dl-stall-st-waiting: #5AC8FA;
+  --dl-stall-st-preparing: #FF9F0A;
+  --dl-stall-st-done: #FFD60A;
+  --dl-stall-st-ready: #30D158;
+  --dl-stall-st-held: #BF5AF2;
+  --dl-stall-st-handed: #00D4AA;
+  --dl-stall-st-paused: #AEAEB2;
+  --dl-stall-st-priority: #FF453A;
+  --dl-stall-pill-h: 4.5rem;
+}
+
+:root, [data-theme="stall-night"] {
+  --dl-stall-bg-art:
+    radial-gradient(56rem 32rem at 18% -8%, rgba(56,189,248,.18), transparent 58%),
+    radial-gradient(40rem 26rem at 110% 8%, rgba(69,238,248,.10), transparent 52%),
+    radial-gradient(31rem 24rem at 50% 120%, rgba(37,99,235,.16), transparent 60%);
+  --dl-stall-chrome: linear-gradient(180deg, rgba(4,8,17,.96) 60%, rgba(4,8,17,.82) 100%);
+  --dl-stall-card-edge: inset 0 1px 0 rgba(255,255,255,.07);
+  --dl-stall-card-lift: 0 4px 16px rgba(0,0,0,.28);
+  --dl-stall-card-in-mix: 13%;
+  --dl-stall-add-bg: rgba(12,24,44,.38);
+  --dl-stall-num-weight: 200;
+  --dl-stall-glow: 0 0 16px rgba(69,238,248,.22);
+  --dl-stall-cta: linear-gradient(180deg, #8be7ff 0%, #45eef8 42%, #2ac4e8 100%);
+  --dl-stall-cta-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 0 18px rgba(69,238,248,.22);
+  --dl-stall-on-cta: #041018;
+  --dl-stall-on-warn: #1a1300; /* P2 text on the yellow warning Complete (s121) */
+  --dl-stall-hold-fill: #F2C418; /* s121 yellow Complete + hold bar (night) */
+  --dl-stall-blue: #2a76e0;
+  --dl-stall-on-blue: #ffffff;
+  --dl-stall-paste-bg: #fff4c2;
+  --dl-stall-paste-text: #2a2210;
+  --dl-stall-paper: #ffffff;
+  --dl-stall-paper-ink: #000000;
+  --dl-stall-del-bg: color-mix(in srgb, #FF453A 74%, #3a1018);
+  --dl-stall-sheet: rgba(11,22,40,.96);
+  --dl-stall-pop: 0 10px 28px rgba(0,0,0,.45);
+  --dl-stall-qr-shadow: 0 8px 28px rgba(0,0,0,.40);
+  --dl-stall-thumb: #e6f4ff;
+  --dl-stall-thumb-shadow: 0 3px 10px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.7);
+  --dl-stall-scrim-soft: rgba(2,5,12,.42);
+  --dl-stall-ghost: rgba(255,255,255,.06);
+  --dl-stall-pos-text: #30D158;
+  --dl-stall-warn-text: #FF9F0A;
+  --dl-stall-danger-text: #FF453A;
+  --dl-stall-info-text: #5AC8FA;
+  --dl-stall-accent-glow: rgba(69,238,248,.12);
+}
+
+[data-theme="stall-day"] {
+  --dl-stall-bg-art:
+    radial-gradient(56rem 32rem at 18% -8%, rgba(69,238,248,.22), transparent 58%),
+    radial-gradient(40rem 26rem at 110% 8%, rgba(56,189,248,.14), transparent 52%),
+    radial-gradient(31rem 24rem at 50% 120%, rgba(99,140,255,.12), transparent 60%);
+  --dl-stall-chrome: linear-gradient(180deg, rgba(255,255,255,.94) 60%, rgba(255,255,255,.84) 100%);
+  --dl-stall-card-edge: inset 0 1px 0 rgba(255,255,255,1);
+  --dl-stall-card-lift: 0 1px 2px rgba(10,30,60,.06), 0 6px 18px rgba(10,40,80,.08);
+  --dl-stall-card-in-mix: 15%;
+  --dl-stall-add-bg: rgba(255,255,255,.55);
+  --dl-stall-num-weight: 300;
+  --dl-stall-glow: none;
+  --dl-stall-cta: linear-gradient(180deg, #7ff0ff 0%, #2fe0f0 45%, #12bfe0 100%);
+  --dl-stall-cta-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 4px 14px rgba(6,182,212,.35);
+  --dl-stall-on-cta: #031620;
+  --dl-stall-on-warn: #1a1300; /* P2 text on the yellow warning Complete (s121) */
+  --dl-stall-hold-fill: #EDBF08; /* s121 yellow Complete + hold bar (day) */
+  --dl-stall-blue: #1f6fd9;
+  --dl-stall-on-blue: #ffffff;
+  --dl-stall-paste-bg: #fff4c2;
+  --dl-stall-paste-text: #2a2210;
+  --dl-stall-paper: #ffffff;
+  --dl-stall-paper-ink: #000000;
+  --dl-stall-del-bg: #d70015;
+  --dl-stall-sheet: rgba(255,255,255,.97);
+  --dl-stall-pop: 0 10px 28px rgba(10,40,80,.18);
+  --dl-stall-qr-shadow: 0 0 0 1px rgba(14,70,120,.10), 0 8px 24px rgba(10,40,80,.12);
+  --dl-stall-thumb: #ffffff;
+  --dl-stall-thumb-shadow: 0 2px 8px rgba(10,40,80,.25), inset 0 0 0 1px rgba(14,70,120,.12);
+  --dl-stall-scrim-soft: rgba(10,22,40,.22);
+  --dl-stall-ghost: rgba(14,70,120,.05);
+  --dl-stall-pos-text: #17702e;
+  --dl-stall-warn-text: #a65400;
+  --dl-stall-danger-text: #c20012;
+  --dl-stall-info-text: #0069a8;
+  --dl-stall-accent-glow: rgba(6,182,212,.14);
+}
