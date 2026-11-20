@@ -49,7 +49,7 @@ export interface Bodies {
   'day.start': { dayId: string; label: string };
   /** `device` (2.1.0, optional, Q-DRAFT-SYNC): the device label, so every Counter sees whose draft it is. */
   'order.create': { orderId: string; dayId: string; token: number; servedBy: string; device?: string };
-  'line.add': { orderId: string; lineId: string; itemId: string; name: string; price: Paise; category: string; stationId: string; qty: number; variant?: string; addons?: string[]; unit?: string };
+  'line.add': { orderId: string; lineId: string; itemId: string; name: string; price: Paise; category: string; stationId: string; qty: number; variant?: string; addons?: string[]; unit?: string; secondaryUnit?: string; secondaryUnitsPerPrimary?: number };
   'line.qty': { orderId: string; lineId: string; qty: number };
   'line.note': { orderId: string; lineId: string; note: string };
   'line.status': { orderId: string; lineId: string; status: LineStatus };
@@ -189,7 +189,7 @@ const S: Record<OpKind, Record<string, FieldType>> = {
   'order.release': { orderId: 's', deviceId: 's', reason: 's' },
 };
 /** Optional fields (additive, 2.1.0): absent is fine; present must have the right type. */
-const OPTIONAL: Partial<Record<OpKind, Record<string, FieldType>>> = {\n  'line.add': { variant: 's', addons: 'a', unit: 's' },
+const OPTIONAL: Partial<Record<OpKind, Record<string, FieldType>>> = {\n  'line.add': { variant: 's', addons: 'a', unit: 's', secondaryUnit: 's', secondaryUnitsPerPrimary: 'n' },
   'order.create': { device: 's' },
   'refund.add': { reason: 's', lines: 'a', restock: 'b' },
 };
@@ -211,5 +211,5 @@ export function isValidOp(value: unknown): value is Op {
   if (!Object.entries(S[value.kind]).every(([k, t]) => okField(t, body[k]))) return false;
   const opt = OPTIONAL[value.kind] ?? {};
   if (!Object.entries(opt).every(([k, t]) => body[k] === undefined || okField(t, body[k]))) return false;
-  return (value.kind !== 'refund.add' || body.lines === undefined || isRefundLines(body.lines))\n    && (value.kind !== 'line.add' || body.addons === undefined || (Array.isArray(body.addons) && body.addons.every((x) => typeof x === 'string')));
+  return (value.kind !== 'refund.add' || body.lines === undefined || isRefundLines(body.lines))\n    && (value.kind !== 'line.add' || body.addons === undefined || (Array.isArray(body.addons) && body.addons.every((x) => typeof x === 'string')))\n    && (value.kind !== 'line.add' || body.secondaryUnitsPerPrimary === undefined || (Number.isInteger(body.secondaryUnitsPerPrimary) && Number(body.secondaryUnitsPerPrimary) > 0));
 }
