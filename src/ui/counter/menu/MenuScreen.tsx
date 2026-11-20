@@ -39,14 +39,13 @@ function Card({ it }: { it: Item }) {
     <article className={cls} style={{ '--item-accent': `var(--dl-stall-swatch-${String(it.swatch)})` } as React.CSSProperties}>
       <div role="button" tabIndex={0} className={s.hit} aria-label={`${it.name}, add one${badge ? `, ${badge.text}` : ''}`} {...press} />
       <span className={s.accent} />
-      <div className={s.name}>{it.name}</div>
+      <div className={s.name}>{it.name}{it.unit ? <small className={s.unit}> · {it.unit}</small> : null}</div>
       {badge && qty === 0 ? <div className={badge.tone === 'low' ? s.stockLow : badge.tone === 'out' ? s.stockOut : s.stock}>{badge.text}</div> : null}
       {qty > 0 && noteLine ? (
         <button type="button" className={note ? s.pencilHas : s.pencil} aria-label={note ? 'Edit note' : 'Add note'}
           onClick={() => { openSheet({ kind: 'lineNote', lineId: noteLine.lineId }); }}><Icon name="pencil" /></button>
       ) : null}
       <Money p={displayPrice} className={s.price} />
-      {it.unit ? <span className={s.unit}>{it.unit}</span> : null}
       {(it.variants?.length ?? 0) > 0 || (it.addons?.length ?? 0) > 0 ? <span className={s.options}>Customise</span> : null}
       {note ? <div className={s.snippet}>{note}</div> : null}
       {qty > 0 ? (
