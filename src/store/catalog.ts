@@ -1,11 +1,11 @@
 // Menu items, stock and payees (F-07 F-08 F-15). Names are typed in the app, never shipped in the repo.
 import { CONFIG } from '../config';
-import type { ItemFields } from '../contract';
+import type { ItemFields, MenuPriceOption } from '../contract';
 import type { Core, Log } from './core';
 import { isUpiId } from './rules/upi';
 import * as amounts from './rules/amounts';
 
-export type ItemDraft = Pick<ItemFields, 'name' | 'price' | 'swatch' | 'category' | 'stationId'> & { count: number | null };
+export type ItemDraft = Pick<ItemFields, 'name' | 'price' | 'swatch' | 'category' | 'stationId'> & { count: number | null; unit?: string; addons?: readonly MenuPriceOption[]; variants?: readonly MenuPriceOption[]; secondaryUnit?: string; secondaryUnitsPerPrimary?: number; discountKind?: 'none' | 'amount' | 'pct'; discountValue?: number };
 
 function itemActions(core: Core, log: Log) {
   const st = () => core.get();
@@ -21,8 +21,25 @@ function itemActions(core: Core, log: Log) {
       const order = itemId ? undefined : items.reduce((m, i) => Math.max(m, i.order), 0) + 1;
       const id = itemId ?? core.env.makeId();
       const swatch = Math.abs(Math.trunc(d.swatch)) % CONFIG.swatchCount;
-      log.dispatch('item.set', { itemId: id, fields: { name, price: d.price, swatch, category: d.category.trim(), stationId: d.stationId, count: d.count,
-        ...(order === undefined ? {} : { order, lowAt: CONFIG.stock.lowAtDefault }) } });
+      const previous = itemId ? st().folded.items[itemId] : undefined;
+      const cleanOptions = (options: readonly MenuPriceOption[] | undefined): readonly MenuPriceOption[] => (options ?? []).slice(0, 30)
+        .map((x) => ({ id: x.id.trim().slice(0, 80), name: x.name.trim().replace(/\\s+/g, ' ').slice(0, 60), priceDelta: Math.trunc(x.priceDelta) }))
+        .filter((x) => x.id && x.name && Number.isSafeInteger(x.priceDelta) && Math.abs(x.priceDelta) <= CONFIG.limits.moneyMaxPaise);
+      const addons = cleanOptions(d.addons ?? previous?.addons);
+      const variants = cleanOptions(d.variants ?? previous?.variants);
+      if ((d.addons ?? previous?.addons ?? []).length !== addons.length || (d.variants ?? previous?.variants ?? []).length !== variants.length) return 'Check add-on and variant names and prices';
+      const discountKind = d.discountKind ?? previous?.discountKind ?? 'none';
+      const discountValue = Math.max(0, Math.trunc(d.discountValue ?? previous?.discountValue ?? 0));
+      if ((discountKind === 'pct' && discountValue > 100) || (discountKind === 'amount' && discountValue > d.price)) return 'Check the item discount';
+      const secondaryUnitsPerPrimary = Math.max(1, Math.trunc(d.secondaryUnitsPerPrimary ?? previous?.secondaryUnitsPerPrimary ?? 1));
+      if (secondaryUnitsPerPrimary > 100000) return 'Check the unit conversion';
+      log.dispatch('item.set', { itemId: id, fields: {
+        name, price: d.price, swatch, category: d.category.trim(), stationId: d.stationId, count: d.count,
+        unit: (d.unit ?? previous?.unit ?? '').trim().slice(0, 20),
+        addons, variants, secondaryUnit: (d.secondaryUnit ?? previous?.secondaryUnit ?? '').trim().slice(0, 20),
+        secondaryUnitsPerPrimary, discountKind, discountValue,
+        ...(order === undefined ? {} : { order, lowAt: CONFIG.stock.lowAtDefault })
+      } });
       return null;
     },
     removeItem(itemId: string) { log.dispatch('item.set', { itemId, fields: { removed: true } }); },
