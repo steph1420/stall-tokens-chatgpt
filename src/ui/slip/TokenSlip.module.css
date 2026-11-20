@@ -1,0 +1,24 @@
+/* F-42 Token slip: about 58 mm paper (48 mm printable). Paper colours from tokens; mm only, no px. */
+.preview { position: fixed; inset: 0; z-index: var(--dl-z-sheet); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: color-mix(in srgb, var(--dl-color-bg) 88%, transparent); }
+.slip { width: 58mm; padding: 4mm 5mm; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 3.2mm; line-height: 1.35; color: var(--dl-stall-paper-ink); background: var(--dl-stall-paper); box-shadow: var(--dl-color-shadow); }
+.stall { text-align: center; font-weight: 700; font-size: 3.6mm; }
+.tokLab { margin-top: 2mm; text-align: center; font-size: 2.8mm; letter-spacing: 0.3mm; text-transform: uppercase; }
+.tok { text-align: center; font-size: 16mm; font-weight: 800; line-height: 1; }
+.meta { text-align: center; font-size: 2.8mm; margin-top: 1mm; }
+.lines { list-style: none; margin: 3mm 0 0; padding: 2mm 0 0; border-top: 0.3mm dashed var(--dl-stall-paper-ink); }
+.lines li, .total { display: flex; justify-content: space-between; gap: 2mm; }
+.total { margin-top: 2mm; padding-top: 1.5mm; border-top: 0.3mm dashed var(--dl-stall-paper-ink); font-weight: 700; font-size: 3.6mm; }
+.foot { margin-top: 3mm; text-align: center; font-size: 2.8mm; }
+.close { min-height: var(--dl-hit-comfortable); padding: 0 1.5rem; border-radius: var(--dl-radius-md); font-weight: 600; color: var(--dl-color-text); background: var(--dl-color-surface); }
+
+.btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+.msg { margin: 0; font-size: 0.875rem; color: var(--dl-color-text-muted); text-align: center; }
+
+@page { size: 58mm auto; margin: 0; }
+@media print {
+  :global(body *) { visibility: hidden; }
+  .slip, .slip * { visibility: visible; }
+  .preview { position: static; background: none; }
+  .slip { position: absolute; left: 0; top: 0; box-shadow: none; }
+  .close, .msg { display: none; }
+}
