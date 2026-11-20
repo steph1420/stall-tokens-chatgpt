@@ -1,0 +1,56 @@
+// Renders check-in screenshots (night + day) of the Counter flow. Usage: node e2e/shots.mjs <outdir>
+import { chromium } from '@playwright/test';
+const out = process.argv[2];
+const base = 'http://localhost:4173/';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
+const { demoOps } = await import('./seed-plain.mjs');
+for (const theme of ['night', 'day']) {
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, serviceWorkers: 'block' });
+  const p = await ctx.newPage();
+  p.on('pageerror', (e) => console.log('PAGEERROR', e.message));
+  p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('CONSOLE', m.text()); });
+  await p.goto(base);
+  await p.evaluate(async ({ theme, ops }) => {
+    localStorage.setItem('stall-tokens.v2.device', JSON.stringify({ deviceId: 'shotdevice01', theme, servingName: 'Server-A', rangeIndex: 0, haptics: 'off', autoPrep: false, stationLook: 'full' }));
+    await new Promise((res) => { const r = indexedDB.open('stall-tokens.v2.log', 1); r.onupgradeneeded = () => r.result.createObjectStore('ops', { keyPath: 'opId' });
+      r.onsuccess = () => { const tx = r.result.transaction('ops', 'readwrite'); ops.forEach((o) => tx.objectStore('ops').put(o)); tx.oncomplete = () => { r.result.close(); res(); }; }; });
+  }, { theme, ops: demoOps() });
+  await p.reload(); await p.waitForTimeout(400);
+  const shot = async (n) => { await p.waitForTimeout(350); await p.screenshot({ path: `${out}/${n}-${theme}.png` }); };
+  await shot('01-launch');
+  await p.getByRole('button', { name: /counter/i }).first().click();
+  await shot('02-menu-empty');
+  for (const [n, k] of [['Tea', 2], ['Samosa', 3], ['Vada Pav', 1], ['Coffee', 1]]) for (let i = 0; i < k; i++) await p.getByRole('button', { name: new RegExp(`^${n}, add one`) }).first().click();
+  await shot('03-menu');
+  await p.getByRole('button', { name: /^Bill|items/ }).last().click().catch(() => console.log('no bill button'));
+  await shot('04-billing');
+  await p.getByRole('button', { name: /^Pay$/ }).click().catch(() => console.log('no pay'));
+  await p.getByRole('group', { name: 'How to pay' }).getByRole('button', { name: /^Cash ₹/ }).click().catch(() => console.log('no cash'));
+  await shot('05-payment-cash');
+  await p.getByRole('group', { name: 'How to pay' }).getByRole('button', { name: 'Split' }).click();
+  await p.getByRole('button', { name: /^UPI ₹/ }).click();
+  await shot('06-numpad');
+  for (const k of ['5', '0']) await p.getByRole('button', { name: k, exact: true }).click();
+  await p.getByRole('button', { name: 'Done' }).click();
+  await shot('07-payment-split');
+  await p.getByRole('radio', { name: '₹10' }).click().catch(() => console.log('no tip'));
+  await p.getByRole('button', { name: 'Count notes' }).click();
+  await p.getByRole('button', { name: 'Add a ₹100 note' }).click();
+  await shot('08-payment-tip-notes');
+  await p.mouse.wheel(0, 2000); await shot('09-payment-scrolled');
+  await p.getByRole('button', { name: 'Confirm payment' }).click();
+  await shot('10-paid');
+  await p.getByRole('button', { name: /New order/ }).first().click();
+  await p.getByRole('button', { name: /^Tea, add one/ }).click();
+  await p.getByRole('tab', { name: /Open Orders/ }).click();
+  await shot('11-open-orders');
+  await p.getByRole('tab', { name: /New Orders/ }).click();
+  const tea = p.getByRole('button', { name: /^Tea, add one/ });
+  const bx = await tea.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.mouse.down(); await p.waitForTimeout(900); await p.mouse.up();
+  await shot('12-stock-panel');
+  await p.keyboard.press('Escape');
+  await p.getByRole('button', { name: 'More', exact: true }).click();
+  await shot('13-more');
+  await ctx.close();
+}
+await b.close();
