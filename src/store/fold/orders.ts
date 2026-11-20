@@ -66,7 +66,7 @@ function setQty(s: Folded, o: Order, lineId: string, rawQty: number): Folded {
 function addLine(s: Folded, o: Order, b: Op<'line.add'>['body']): Folded {
   if (o.lines.some((l) => l.lineId === b.lineId)) return s;
   const line: Line = { lineId: b.lineId, itemId: b.itemId, name: b.name, price: Math.trunc(b.price), category: b.category,
-    stationId: b.stationId, qty: 0, note: '', status: 'draft', committed: 0, byCounter: false, restocked: 0 };
+    stationId: b.stationId, qty: 0, note: '', status: 'draft', committed: 0, byCounter: false, restocked: 0,\n    ...(b.variant ? { variant: b.variant } : {}), ...(b.addons ? { addons: b.addons } : {}), ...(b.unit ? { unit: b.unit } : {}) };
   const next = { ...o, lines: [...o.lines, line] };
   return setQty(withOrder(s, next), next, b.lineId, b.qty);
 }
