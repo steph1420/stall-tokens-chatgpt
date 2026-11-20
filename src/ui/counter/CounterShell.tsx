@@ -67,7 +67,6 @@ function CurrentLine() {
 function HeaderEnd({ settled }: { settled: boolean }) {
   const c = useApp((st) => st.counter);
   const openSheet = useApp((st) => st.openSheet);
-  const go = useApp((st) => st.go);
   const drafts = useApp((st) => draftOrders(liveOrders(st.folded)).filter((o) => o.id !== st.ui.orderId).length);
   return (
     <div className={s.hdrEnd}>
@@ -140,6 +139,7 @@ export function CounterShell() {
   const page = useApp((st) => (st.ui.orderId ? st.ui.pages[st.ui.orderId] : undefined) ?? 'menu');
   const stallName = useApp((st) => st.folded.settings.stallName ?? 'Fair stall');
   const openSheet = useApp((st) => st.openSheet);
+  const go = useApp((st) => st.go);
   const take = useTakeOver();
   const wide = useWide();
   return (
