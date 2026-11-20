@@ -1,0 +1,59 @@
+/* F-23 / F-24 Money entry + Paid by sheet (21-polish2/money, received, paidby, paidby-mixed). Tokens only. */
+.entrySpent, .entryRecv { --acc: var(--dl-stall-del-bg); --on-acc: var(--dl-stall-on-danger); height: 100%; max-width: 48rem; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; padding: calc(0.75rem + env(safe-area-inset-top)) 1rem calc(1rem + env(safe-area-inset-bottom)); }
+.entryRecv { --acc: var(--dl-stall-go); --on-acc: var(--dl-stall-on-go); }
+.etop { display: flex; align-items: center; gap: 0.75rem; }
+.x { width: var(--dl-hit-min); height: var(--dl-hit-min); display: grid; place-items: center; color: var(--dl-color-text-muted); }
+.x svg { width: 1.25rem; height: 1.25rem; }
+.seg { flex: 1; max-width: 18rem; display: grid; grid-template-columns: 1fr 1fr; padding: 0.25rem; border-radius: var(--dl-radius-pill); background: var(--dl-color-surface); }
+.segBtn { min-height: 2.75rem; border-radius: var(--dl-radius-pill); font-size: 1rem; font-weight: 600; color: var(--dl-color-text-muted); }
+.segOn { composes: segBtn; color: var(--on-acc); background: var(--acc); }
+.etiles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; }
+.etile { position: relative; min-height: 6rem; border-radius: var(--dl-radius-lg); padding: 0.875rem 1rem; text-align: left; display: flex; flex-direction: column; justify-content: space-between; background: var(--dl-color-surface); box-shadow: var(--dl-stall-card-edge); }
+.etile small { font-size: 0.875rem; color: var(--dl-color-text-muted); }
+.etile b { font-size: 1.375rem; font-weight: 700; color: var(--dl-color-text-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chev { position: absolute; right: 0.875rem; top: 0.875rem; width: 0.875rem; height: 0.875rem; color: var(--dl-color-text-faint); }
+.don { align-self: flex-start; min-height: 2.25rem; padding: 0 1rem; border-radius: var(--dl-radius-pill); font-size: 0.875rem; font-weight: 600; color: var(--dl-color-text-muted); background: var(--dl-color-surface); }
+.donOn { composes: don; color: var(--on-acc); background: var(--acc); }
+.amount { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem; font-size: 4.5rem; font-weight: 800; letter-spacing: -0.04em; color: var(--dl-color-text-display); font-variant-numeric: tabular-nums; min-height: 6rem; }
+.rs { font-size: 2.25rem; align-self: flex-start; margin-top: 30%; color: var(--dl-stall-info-text); }
+.keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.key { height: 3.5rem; border-radius: var(--dl-radius-sm); display: grid; place-items: center; font-size: 1.5rem; font-weight: 500; color: var(--dl-color-text); background: var(--dl-color-surface); }
+.bs { width: 1.625rem; height: 1.25rem; }
+.save { min-height: 3.5rem; border-radius: var(--dl-radius-lg); font-family: var(--dl-stall-font-display); font-size: 1.125rem; font-weight: 700; color: var(--on-acc); background: var(--acc); }
+.save:disabled { opacity: 0.45; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0; }
+.chip { min-height: 2.25rem; padding: 0 0.875rem; border-radius: var(--dl-radius-pill); font-size: 0.875rem; color: var(--dl-color-text); background: var(--dl-color-surface); box-shadow: inset 0 0 0 var(--dl-stall-hair) var(--dl-color-hairline); }
+.barSpent, .barRecv { min-height: var(--dl-hit-comfortable); border-radius: var(--dl-radius-md); font-size: 1rem; font-weight: 700; color: var(--dl-stall-on-danger); background: var(--dl-stall-del-bg); }
+.barRecv { color: var(--dl-stall-on-go); background: var(--dl-stall-go); }
+
+.opts { display: flex; flex-direction: column; gap: 0.5rem; }
+.opt { width: 100%; display: flex; align-items: center; gap: 0.875rem; min-height: 4rem; padding: 0.5rem 1rem; border-radius: var(--dl-radius-md); text-align: left; color: var(--dl-color-text); background: var(--dl-color-surface); }
+.opt b { display: block; font-size: 1.0625rem; color: var(--dl-color-text-display); }
+.opt small { font-size: 0.8125rem; color: var(--dl-color-text-muted); }
+.optOn { composes: opt; background: color-mix(in srgb, var(--dl-color-danger) 18%, var(--dl-color-surface)); }
+.optIc { font-size: 1.5rem; }
+.grow { flex: 1; min-width: 0; }
+.tick { color: var(--dl-stall-danger-text); font-weight: 700; }
+.people { list-style: none; margin: 0.25rem 0 0.5rem; padding: 0 0.5rem; }
+.person { width: 100%; display: flex; align-items: center; gap: 0.75rem; min-height: 3rem; text-align: left; font-size: 1rem; color: var(--dl-color-text); }
+.av { flex: none; width: 2.25rem; height: 2.25rem; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--dl-stall-white); background: var(--c); }
+.avAdd { composes: av; color: var(--dl-color-text-muted); background: var(--dl-color-surface); }
+.addName { flex: 1; min-width: 0; min-height: var(--dl-hit-min); font: inherit; color: var(--dl-color-text); background: transparent; border: 0; }
+.addName:focus { outline: none; }
+.mixed { display: flex; flex-direction: column; gap: 0.375rem; padding: 0.5rem 0.5rem 0; }
+.part { display: flex; align-items: center; gap: 0.5rem; min-height: 3rem; font-size: 1rem; color: var(--dl-color-text); }
+.partAmt { width: 6rem; min-height: 2.5rem; padding: 0 0.75rem; border-radius: var(--dl-radius-sm); text-align: right; font: inherit; font-weight: 700; color: var(--dl-color-text-display); background: var(--dl-color-surface); border: 0; }
+.partX { width: var(--dl-hit-min); height: var(--dl-hit-min); color: var(--dl-color-text-faint); font-size: 1.25rem; }
+.addRow { display: flex; flex-direction: column; gap: 0.375rem; }
+.addAnother { align-self: flex-start; min-height: var(--dl-hit-min); padding: 0 0.25rem; font-size: 1rem; color: var(--dl-color-text-muted); }
+.cov { display: flex; justify-content: space-between; align-items: center; min-height: 3rem; padding: 0 1rem; margin-top: 0.25rem; border-radius: var(--dl-radius-md); font-size: 0.9375rem; color: var(--dl-color-text-muted); background: color-mix(in srgb, var(--dl-color-warning) 12%, transparent); }
+.cov b { color: var(--dl-stall-warn-text); }
+.covOk { composes: cov; background: color-mix(in srgb, var(--dl-color-positive) 14%, transparent); }
+.covOk b { color: var(--dl-stall-pos-text); }
+/* F-47 receipt photos */
+.photoChip { position: relative; display: inline-grid; place-items: center; min-width: var(--dl-hit-min); min-height: var(--dl-hit-min); border-radius: var(--dl-radius-md); font-size: 1.125rem; background: var(--dl-color-surface); cursor: pointer; }
+.photoInput { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.photoView { position: fixed; inset: 0; z-index: var(--dl-z-sheet); display: flex; flex-direction: column; background: var(--dl-color-bg); }
+.photoImg { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
+.photoBar { display: flex; justify-content: space-between; gap: 0.75rem; padding: 1rem; }
+.photoBtn { flex: 1; min-height: var(--dl-hit-comfortable); border-radius: var(--dl-radius-md); font-weight: 600; color: var(--dl-color-text); background: var(--dl-color-surface); }
