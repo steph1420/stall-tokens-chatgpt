@@ -12,9 +12,9 @@ export type ReceiptBlock =
   | { readonly id: string; readonly type: 'variable'; readonly key: PrintVariable; readonly align?: 'left' | 'center' | 'right'; readonly bold?: boolean; readonly large?: boolean }
   | { readonly id: string; readonly type: 'text'; readonly text: string; readonly align?: 'left' | 'center' | 'right'; readonly bold?: boolean }
   | { readonly id: string; readonly type: 'divider' }
-  | { readonly id: string; readonly type: 'items' }
+  | { readonly id: string; readonly type: 'items'; readonly showQty?: boolean; readonly showUnit?: boolean; readonly showRate?: boolean; readonly showAmount?: boolean; readonly showItemNote?: boolean }
   | { readonly id: string; readonly type: 'image'; readonly dataUrl: string; readonly widthDots: number };
-export interface ReceiptTemplate { readonly version: 1; readonly paperWidth: 58 | 80; readonly blocks: readonly ReceiptBlock[] }
+export interface ReceiptTemplate { readonly version: 1; readonly paperWidth: 58 | 80; readonly cutPaper?: boolean; readonly feedLines?: number; readonly blocks: readonly ReceiptBlock[] }
 export interface ReceiptItem { readonly name: string; readonly quantity: number; readonly unit?: string; readonly rate: string; readonly amount: string; readonly note?: string }
 export interface ReceiptContext {
   readonly values: Readonly<Partial<Record<PrintVariable, string>>>;
@@ -42,7 +42,7 @@ export const DEFAULT_RECEIPT_TEMPLATE: ReceiptTemplate = {
     variable('b-date', 'dateTime', { align: 'center' }),
     variable('b-serving', 'servingName'),
     variable('b-customer', 'customerName'),
-    { id: 'b-items', type: 'items' },
+    { id: 'b-items', type: 'items', showQty: true, showUnit: true, showRate: true, showAmount: true, showItemNote: true },
     variable('b-order-note', 'orderNote'),
     { id: 'b-rule-2', type: 'divider' },
     variable('b-subtotal', 'subtotal'),
@@ -64,7 +64,7 @@ export function parseReceiptTemplate(raw: string | undefined): ReceiptTemplate {
     const v: unknown = JSON.parse(raw);
     if (typeof v !== 'object' || v === null) return DEFAULT_RECEIPT_TEMPLATE;
     const x = v as Partial<ReceiptTemplate>;
-    if (x.version !== 1 || (x.paperWidth !== 58 && x.paperWidth !== 80) || !Array.isArray(x.blocks)) return DEFAULT_RECEIPT_TEMPLATE;
+    if (x.version !== 1 || (x.paperWidth !== 58 && x.paperWidth !== 80) || !Array.isArray(x.blocks) || (x.feedLines !== undefined && (!Number.isInteger(x.feedLines) || x.feedLines < 0 || x.feedLines > 10))) return DEFAULT_RECEIPT_TEMPLATE;
     const allowed = new Set<string>(PRINT_VARIABLES.map(([key]) => key));
     const blocks = x.blocks.filter((b): b is ReceiptBlock => {
       if (typeof b !== 'object' || b === null || typeof b.id !== 'string' || typeof b.type !== 'string') return false;
@@ -86,10 +86,17 @@ export function buildReceiptRows(template: ReceiptTemplate, context: ReceiptCont
     if (block.type === 'image') { rows.push({ type: 'image', dataUrl: block.dataUrl, widthDots: block.widthDots }); continue; }
     if (block.type === 'items') {
       for (const item of context.items) {
-        const unit = item.unit ? ` ${item.unit}` : '';
-        rows.push({ type: 'text', left: `${item.quantity} × ${item.name}${unit}`, right: item.amount, align: 'left', bold: false, large: false });
-        rows.push({ type: 'text', left: `  @ ${item.rate}`, align: 'left', bold: false, large: false });
-        if (item.note) rows.push({ type: 'text', left: `  Note: ${item.note}`, align: 'left', bold: false, large: false });
+        const unit = block.showUnit === false || !item.unit ? '' : ` ${item.unit}`;
+        const qty = block.showQty === false ? '' : `${item.quantity} × `;
+        const showAmount = block.showAmount !== false;
+        rows.push({
+          type: 'text',
+          left: `${qty}${item.name}${unit}`,
+          ...(showAmount ? { right: item.amount } : {}),
+          align: 'left', bold: false, large: false,
+        });
+        if (block.showRate !== false) rows.push({ type: 'text', left: `  @ ${item.rate}`, align: 'left', bold: false, large: false });
+        if (block.showItemNote !== false && item.note) rows.push({ type: 'text', left: `  Note: ${item.note}`, align: 'left', bold: false, large: false });
       }
       continue;
     }
