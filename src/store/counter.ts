@@ -78,7 +78,7 @@ function navActions(x: Ctx) {
   const self = {
     /** + New order. W-07/W-14: an empty current draft is reused, so taps never burn tokens or strand drafts. */
     newOrder(): string {
-      if (askDay(x)) { ui({ sheet: { kind: 'newDay' }, pendingItem: '' }); return ''; }
+      if (askDay(x)) { ui({ sheet: { kind: 'newDay' }, pendingItem: '', pendingItemOptions: null }); return ''; }
       const cur = current();
       if (cur && empty(cur) && cur.dayId === currentDay()) {
         core.set((s) => ({ ui: { ...s.ui, orderId: cur.id, counterTab: 'new', pages: { ...s.ui.pages, [cur.id]: 'menu' } } }));
@@ -122,7 +122,7 @@ function dayActions(x: Ctx) {
     answerDay(start: boolean): string {
       if (start) self.startToday(); else ui({ dayKept: istDate(core.env.now()) });
       const item = st().ui.pendingItem;
-      ui({ sheet: null, pendingItem: '' });
+      ui({ sheet: null, pendingItem: '', pendingItemOptions: null });
       return item;
     },
   };
@@ -146,7 +146,7 @@ function lineActions(x: Ctx, nav: Nav) {
       const addonNames = addonIds.map((id) => (it.addons ?? []).find((a) => a.id === id)?.name).filter((name): name is string => !!name);
       const lineName = [it.name, variant?.name, ...(addonNames.length ? ['+ ' + addonNames.join(', ')] : [])].filter(Boolean).join(' · ');
       const o = current() ?? ensureOrder(x, nav);
-      if (!o) { if (st().ui.sheet?.kind === 'newDay') x.ui({ pendingItem: itemId }); return; }
+      if (!o) { if (st().ui.sheet?.kind === 'newDay') x.ui({ pendingItem: itemId, pendingItemOptions: options }); return; }
       const draft = [...o.lines].reverse().find((l) =>
         l.itemId === itemId && l.status === 'draft' && (l.variant ?? '') === (variant?.name ?? '')
         && JSON.stringify([...(l.addons ?? [])].sort()) === JSON.stringify(addonNames.slice().sort()));
