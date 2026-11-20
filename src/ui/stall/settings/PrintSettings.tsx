@@ -274,7 +274,7 @@ function PrinterSettings() {
   return (
     <>
       <Opt t="Selected printer" sub={printer ? `${printer.kind === 'usb' ? 'USB' : 'Bluetooth LE'} · ${printer.name}` : 'No direct printer selected on this device'}
-        value={printer ? 'Connected' : 'Not selected'} />
+        value={printer ? 'Selected this session' : 'Not selected'} />
       <div className={kit.row}>
         <button type="button" className={kit.quiet} disabled={!canBluetoothPrint() || busy} onClick={() => { void selectBle(); }}>Select Bluetooth LE</button>
         <button type="button" className={kit.quiet} disabled={!canUsbPrint() || busy} onClick={() => { void selectUsb(); }}>Select USB</button>
