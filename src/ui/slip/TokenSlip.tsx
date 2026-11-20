@@ -1,5 +1,5 @@
 // Receipt preview and print orchestration. The same editable template feeds ESC/POS and system printing.
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CONFIG } from '../../config';
 import { formatInr, type Order, type Paise } from '../../contract';
 import {
@@ -115,7 +115,6 @@ export function TokenSlipPrint({ o, tip, waived, onDone }: { o: Order; tip?: Pai
     window.addEventListener('afterprint', after);
     return () => window.removeEventListener('afterprint', after);
   }, [onDone]);
-  const bytes = useMemo(() => null, [receipt]); // image blocks are rasterised immediately before sending
   const systemPrint = () => window.print();
   const directPrint = async () => {
     if (!printer) return;
@@ -123,7 +122,7 @@ export function TokenSlipPrint({ o, tip, waived, onDone }: { o: Order; tip?: Pai
     setMsg('Preparing receipt…');
     try {
       const prepared = await prepareRows(receipt.rows);
-      const data = escposReceipt(prepared, receipt.template.paperWidth, receipt.context.values.businessName ? false : false);
+      const data = escposReceipt(prepared, receipt.template.paperWidth, false);
       setMsg('Sending to printer…');
       await printToSelectedPrinter(data, printer.kind);
       setMsg('Receipt sent to printer');
@@ -131,7 +130,6 @@ export function TokenSlipPrint({ o, tip, waived, onDone }: { o: Order; tip?: Pai
       setMsg(e instanceof Error ? e.message : 'Printing failed. Check the selected printer.');
     } finally { setBusy(false); }
   };
-  void bytes;
   return (
     <div className={s.preview} role="dialog" aria-label="Print receipt">
       <ReceiptBody rows={receipt.rows} paperWidth={receipt.template.paperWidth} />
