@@ -60,32 +60,59 @@ export const DEFAULT_RECEIPT_TEMPLATE: ReceiptTemplate = {
   ],
 };
 
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+function isReceiptBlock(value: unknown, allowed: ReadonlySet<string>): value is ReceiptBlock {
+  if (!isRecord(value) || typeof value.id !== 'string' || typeof value.type !== 'string') return false;
+  const align = value.align;
+  const alignOk = align === undefined || align === 'left' || align === 'center' || align === 'right';
+  const boldOk = value.bold === undefined || typeof value.bold === 'boolean';
+  const largeOk = value.large === undefined || typeof value.large === 'boolean';
+  switch (value.type) {
+    case 'divider':
+      return true;
+    case 'items':
+      return ['showQty', 'showUnit', 'showRate', 'showAmount', 'showItemNote'].every((key) =>
+        value[key] === undefined || typeof value[key] === 'boolean');
+    case 'text':
+      return typeof value.text === 'string' && alignOk && boldOk;
+    case 'image':
+      return typeof value.dataUrl === 'string' && value.dataUrl.startsWith('data:image/')
+        && value.dataUrl.length <= 40_000 && Number.isInteger(value.widthDots)
+        && Number(value.widthDots) > 0 && Number(value.widthDots) <= 576;
+    case 'variable':
+      return typeof value.key === 'string' && allowed.has(value.key) && alignOk && boldOk && largeOk;
+    default:
+      return false;
+  }
+}
+
 export function parseReceiptTemplate(raw: string | undefined): ReceiptTemplate {
   if (!raw) return DEFAULT_RECEIPT_TEMPLATE;
   try {
-    const v: unknown = JSON.parse(raw);
-    if (typeof v !== 'object' || v === null) return DEFAULT_RECEIPT_TEMPLATE;
-    const x = v as Partial<ReceiptTemplate>;
-    if (x.version !== 1 || (x.paperWidth !== 58 && x.paperWidth !== 80) || !Array.isArray(x.blocks) || (x.feedLines !== undefined && (!Number.isInteger(x.feedLines) || x.feedLines < 0 || x.feedLines > 10)) || (x.cutPaper !== undefined && typeof x.cutPaper !== 'boolean')) return DEFAULT_RECEIPT_TEMPLATE;
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed)) return DEFAULT_RECEIPT_TEMPLATE;
+    const x = parsed as Partial<ReceiptTemplate>;
+    if (x.version !== 1 || (x.paperWidth !== 58 && x.paperWidth !== 80)
+      || !Array.isArray(parsed.blocks)
+      || (parsed.feedLines !== undefined && (!Number.isInteger(parsed.feedLines) || Number(parsed.feedLines) < 0 || Number(parsed.feedLines) > 10))
+      || (parsed.cutPaper !== undefined && typeof parsed.cutPaper !== 'boolean')) return DEFAULT_RECEIPT_TEMPLATE;
     const allowed = new Set<string>(PRINT_VARIABLES.map(([key]) => key));
-    const blocks = x.blocks.filter((b): b is ReceiptBlock => {
-      if (typeof b !== 'object' || b === null || typeof b.id !== 'string' || typeof b.type !== 'string') return false;
-      const alignOk = b.align === undefined || b.align === 'left' || b.align === 'center' || b.align === 'right';
-      const boolsOk = (b.bold === undefined || typeof b.bold === 'boolean') && (b.large === undefined || typeof b.large === 'boolean');
-      if (b.type === 'divider') return true;
-      if (b.type === 'items') return ['showQty', 'showUnit', 'showRate', 'showAmount', 'showItemNote'].every((k) =>
-        (b as Record<string, unknown>)[k] === undefined || typeof (b as Record<string, unknown>)[k] === 'boolean');
-      if (b.type === 'text') return typeof b.text === 'string' && alignOk && boolsOk;
-      if (b.type === 'image') return typeof b.dataUrl === 'string' && b.dataUrl.startsWith('data:image/') && b.dataUrl.length <= 40_000 && Number.isInteger(b.widthDots) && b.widthDots > 0 && b.widthDots <= 576;
-      return b.type === 'variable' && typeof b.key === 'string' && allowed.has(b.key) && alignOk && boolsOk;
-    });
-    return { version: 1, paperWidth: x.paperWidth, cutPaper: x.cutPaper ?? false, feedLines: x.feedLines ?? 4, blocks };
+    const blocks = (parsed.blocks as unknown[]).filter((block) => isReceiptBlock(block, allowed));
+    return {
+      version: 1,
+      paperWidth: x.paperWidth,
+      cutPaper: x.cutPaper ?? false,
+      feedLines: x.feedLines ?? 4,
+      blocks,
+    };
   } catch {
     return DEFAULT_RECEIPT_TEMPLATE;
   }
 }
 
-// eslint-disable-next-line max-lines-per-function -- one ordered pass keeps the receipt template deterministic.
 export function buildReceiptRows(template: ReceiptTemplate, context: ReceiptContext): ReceiptRow[] {
   const rows: ReceiptRow[] = [];
   for (const block of template.blocks) {
