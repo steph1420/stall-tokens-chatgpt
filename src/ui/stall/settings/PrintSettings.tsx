@@ -68,10 +68,10 @@ function makeImageBlock(file: File, paperWidth: 58 | 80): Promise<ReceiptBlock> 
     if (!file.type.startsWith('image/')) { reject(new Error('Choose an image file')); return; }
     if (file.size > 4 * 1024 * 1024) { reject(new Error('Choose an image smaller than 4 MB')); return; }
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Could not read that image'));
+    reader.onerror = () => { reject(new Error('Could not read that image')); };
     reader.onload = () => {
       const image = new Image();
-      image.onerror = () => reject(new Error('That image could not be opened'));
+      image.onerror = () => { reject(new Error('That image could not be opened')); };
       image.onload = () => {
         const maxWidth = paperWidth === 58 ? 384 : 576;
         const scale = Math.min(1, maxWidth / image.naturalWidth, 240 / image.naturalHeight);
@@ -100,12 +100,14 @@ function makeImageBlock(file: File, paperWidth: 58 | 80): Promise<ReceiptBlock> 
           resolve({ id: crypto.randomUUID(), type: 'image', dataUrl, widthDots: width });
         } catch { reject(new Error('Could not prepare that image')); }
       };
-      image.src = String(reader.result ?? '');
+      if (typeof reader.result !== 'string') { reject(new Error('Could not read that image')); return; }
+      image.src = reader.result;
     };
     reader.readAsDataURL(file);
   });
 }
 
+// eslint-disable-next-line max-lines-per-function -- the template maker is a single transactional editor for block order, style and preview.
 function TemplateSheet({ onClose }: { onClose: () => void }) {
   const a = useApp((x) => x);
   const stored = a.folded.settings.printTemplate;
@@ -113,13 +115,13 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
   const [variable, setVariable] = useState<string>('token');
   const [error, setError] = useState('');
   const rows = useMemo(() => buildReceiptRows(template, sampleContext), [template]);
-  const update = (blocks: readonly ReceiptBlock[]) => setTemplate((p) => ({ ...p, blocks }));
+  const update = (blocks: readonly ReceiptBlock[]) => { setTemplate((p) => ({ ...p, blocks })); };
   const addVariable = () => {
     if (!PRINT_VARIABLES.some(([key]) => key === variable)) return;
     update([...template.blocks, { id: crypto.randomUUID(), type: 'variable', key: variable as (typeof PRINT_VARIABLES)[number][0] }]);
   };
-  const addText = () => update([...template.blocks, { id: crypto.randomUUID(), type: 'text', text: 'Your custom message', align: 'center' }]);
-  const addDivider = () => update([...template.blocks, { id: crypto.randomUUID(), type: 'divider' }]);
+  const addText = () => { update([...template.blocks, { id: crypto.randomUUID(), type: 'text', text: 'Your custom message', align: 'center' }]); };
+  const addDivider = () => { update([...template.blocks, { id: crypto.randomUUID(), type: 'divider' }]); };
   const addItems = () => {
     if (template.blocks.some((b) => b.type === 'items')) { setError('The item list is already in the template'); return; }
     update([...template.blocks, { id: crypto.randomUUID(), type: 'items', showQty: true, showUnit: true, showRate: true, showAmount: true, showItemNote: true }]);
@@ -135,15 +137,15 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
       <p className={kit.hint}>Build the printout by adding variables, custom text, item lists, dividers and your own logo. The same template drives thermal and system printing.</p>
       <label className={kit.field}>
         <span className={kit.fieldLab}>Paper width</span>
-        <select className={kit.input} value={String(template.paperWidth)} onChange={(e) => setTemplate((p) => ({ ...p, paperWidth: e.target.value === '80' ? 80 : 58 }))}>
+        <select className={kit.input} value={String(template.paperWidth)} onChange={(e) => { setTemplate((p) => ({ ...p, paperWidth: e.target.value === '80' ? 80 : 58 })); }}>
           <option value="58">58 mm</option><option value="80">80 mm</option>
         </select>
       </label>
       <div className={kit.row}>
-        <label className={kit.grow}><input type="checkbox" checked={template.cutPaper ?? false} onChange={(e) => setTemplate((p) => ({ ...p, cutPaper: e.target.checked }))} /> Cut paper after receipt (only printers with a cutter)
+        <label className={kit.grow}><input type="checkbox" checked={template.cutPaper ?? false} onChange={(e) => { setTemplate((p) => ({ ...p, cutPaper: e.target.checked })); }} /> Cut paper after receipt (only printers with a cutter)
         </label>
         <label className={kit.grow}>Feed lines
-          <select className={kit.input} value={String(template.feedLines ?? 4)} onChange={(e) => setTemplate((p) => ({ ...p, feedLines: Number(e.target.value) }))}>
+          <select className={kit.input} value={String(template.feedLines ?? 4)} onChange={(e) => { setTemplate((p) => ({ ...p, feedLines: Number(e.target.value) })); }}>
             {Array.from({ length: 11 }, (_, n) => <option key={n} value={n}>{n}</option>)}
           </select>
         </label>
@@ -151,7 +153,7 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
       <div className={kit.field}>
         <span className={kit.fieldLab}>Add a variable</span>
         <div className={kit.row}>
-          <select className={kit.input} value={variable} onChange={(e) => setVariable(e.target.value)}>
+          <select className={kit.input} value={variable} onChange={(e) => { setVariable(e.target.value); }}>
             {PRINT_VARIABLES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
           </select>
           <button type="button" className={kit.quiet} onClick={addVariable}>Add</button>
@@ -173,11 +175,11 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
             <div className={kit.row}>
               <strong className={kit.grow}>{labelFor(block)}</strong>
               <button type="button" className={kit.quiet} aria-label={`Move ${labelFor(block)} up`} disabled={index === 0}
-                onClick={() => update(moveReceiptBlock(template.blocks, index, -1))}>↑</button>
+                onClick={() => { update(moveReceiptBlock(template.blocks, index, -1)); }}>↑</button>
               <button type="button" className={kit.quiet} aria-label={`Move ${labelFor(block)} down`} disabled={index === template.blocks.length - 1}
-                onClick={() => update(moveReceiptBlock(template.blocks, index, 1))}>↓</button>
+                onClick={() => { update(moveReceiptBlock(template.blocks, index, 1)); }}>↓</button>
               <button type="button" className={kit.danger} aria-label={`Remove ${labelFor(block)}`}
-                onClick={() => update(template.blocks.filter((x) => x.id !== block.id))}>×</button>
+                onClick={() => { update(template.blocks.filter((x) => x.id !== block.id)); }}>×</button>
             </div>
             {block.type === 'items' ? (
               <div className={kit.field}>
@@ -189,8 +191,8 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
                   ['showItemNote', 'Item note'],
                 ] as const).map(([key, title]) => (
                   <label className={kit.row} key={key}>
-                    <input type="checkbox" checked={block[key] !== false} onChange={(e) => update(template.blocks.map((x) =>
-                      x.id === block.id && x.type === 'items' ? { ...x, [key]: e.target.checked } : x))} />
+                    <input type="checkbox" checked={block[key] !== false} onChange={(e) => { update(template.blocks.map((x) =>
+                      x.id === block.id && x.type === 'items' ? { ...x, [key]: e.target.checked } : x)); }} />
                     {title}
                   </label>
                 ))}
@@ -198,11 +200,11 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
             ) : null}
             {block.type === 'text' ? (
               <input className={kit.input} aria-label="Custom receipt text" value={block.text}
-                onChange={(e) => update(template.blocks.map((x) => x.id === block.id && x.type === 'text' ? { ...x, text: e.target.value } : x))} />
+                onChange={(e) => { update(template.blocks.map((x) => x.id === block.id && x.type === 'text' ? { ...x, text: e.target.value } : x)); }} />
             ) : null}
             {block.type === 'variable' ? (
               <select className={kit.input} aria-label="Receipt variable" value={block.key}
-                onChange={(e) => update(template.blocks.map((x) => x.id === block.id && x.type === 'variable' ? { ...x, key: e.target.value as (typeof PRINT_VARIABLES)[number][0] } : x))}>
+                onChange={(e) => { update(template.blocks.map((x) => x.id === block.id && x.type === 'variable' ? { ...x, key: e.target.value as (typeof PRINT_VARIABLES)[number][0] } : x)); }}>
                 {PRINT_VARIABLES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
             ) : null}
@@ -210,18 +212,18 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
               <>
                 <div className={kit.row}>
                   <label className={kit.grow}>Alignment
-                    <select className={kit.input} value={block.align ?? 'left'} onChange={(e) => update(template.blocks.map((x) =>
-                      x.id === block.id && (x.type === 'variable' || x.type === 'text') ? { ...x, align: e.target.value as 'left' | 'center' | 'right' } : x))}>
+                    <select className={kit.input} value={block.align ?? 'left'} onChange={(e) => { update(template.blocks.map((x) =>
+                      x.id === block.id && (x.type === 'variable' || x.type === 'text') ? { ...x, align: e.target.value as 'left' | 'center' | 'right' } : x)); }}>
                       <option value="left">Left</option><option value="center">Centre</option><option value="right">Right</option>
                     </select>
                   </label>
-                  <label className={kit.grow}><input type="checkbox" checked={block.bold ?? false} onChange={(e) => update(template.blocks.map((x) =>
-                    x.id === block.id && (x.type === 'variable' || x.type === 'text') ? { ...x, bold: e.target.checked } : x))} /> Bold
+                  <label className={kit.grow}><input type="checkbox" checked={block.bold ?? false} onChange={(e) => { update(template.blocks.map((x) =>
+                    x.id === block.id && (x.type === 'variable' || x.type === 'text') ? { ...x, bold: e.target.checked } : x)); }} /> Bold
                   </label>
                 </div>
                 {block.type === 'variable' ? (
-                  <label className={kit.row}><input type="checkbox" checked={block.large ?? false} onChange={(e) => update(template.blocks.map((x) =>
-                    x.id === block.id && x.type === 'variable' ? { ...x, large: e.target.checked } : x))} /> Large text
+                  <label className={kit.row}><input type="checkbox" checked={block.large ?? false} onChange={(e) => { update(template.blocks.map((x) =>
+                    x.id === block.id && x.type === 'variable' ? { ...x, large: e.target.checked } : x)); }} /> Large text
                   </label>
                 ) : null}
               </>
@@ -241,7 +243,7 @@ function TemplateSheet({ onClose }: { onClose: () => void }) {
       </div>
       {error ? <p className={kit.err} role="alert">{error}</p> : null}
       <div className={kit.row}>
-        <button type="button" className={kit.quiet} onClick={() => setTemplate(DEFAULT_RECEIPT_TEMPLATE)}>Restore default</button>
+        <button type="button" className={kit.quiet} onClick={() => { setTemplate(DEFAULT_RECEIPT_TEMPLATE); }}>Restore default</button>
         <span className={kit.grow} />
         <button type="button" className={kit.cta} onClick={() => { a.catalog.setSetting('printTemplate', JSON.stringify(template)); a.money.toast('Receipt template saved'); onClose(); }}>Save template</button>
       </div>
@@ -272,6 +274,7 @@ function SystemPrintTestSheet({ onClose }: { onClose: () => void }) {
   );
 }
 
+// eslint-disable-next-line max-lines-per-function -- printer discovery, test and platform guidance stay together as one settings section.
 function PrinterSettings() {
   const a = useApp((x) => x);
   const [printer, setPrinter] = useState<PrinterChoice | null>(() => selectedPrinter());
@@ -307,13 +310,13 @@ function PrinterSettings() {
       </div>
       <div className={kit.row}>
         <button type="button" className={kit.cta} disabled={!printer || busy} onClick={() => { void test(); }}>{busy ? 'Working…' : 'Test direct printer'}</button>
-        <button type="button" className={kit.quiet} onClick={() => setSystemTest(true)}>Test AirPrint / system print</button>
+        <button type="button" className={kit.quiet} onClick={() => { setSystemTest(true); }}>Test AirPrint / system print</button>
         <span className={kit.grow} />
       </div>
       {!canBluetoothPrint() || !canUsbPrint() ? <p className={kit.hint}>This browser does not expose every direct printer connection. On iPad, use the system Print sheet with an AirPrint-compatible printer.</p> : null}
       <p className={kit.hint}>Bluetooth here means BLE/GATT. Many low-cost thermal printers use Bluetooth Classic (SPP), which browser Bluetooth cannot access. USB requires a USB Printer Class device and a browser with WebUSB.</p>
       {error ? <p className={kit.err} role="alert">{error}</p> : null}
-      {systemTest ? <SystemPrintTestSheet onClose={() => setSystemTest(false)} /> : null}
+      {systemTest ? <SystemPrintTestSheet onClose={() => { setSystemTest(false); }} /> : null}
     </>
   );
 }
@@ -327,12 +330,12 @@ export function PrintSettings() {
   return (
     <>
       <Group label="Receipt & printer">
-        <Opt t="Receipt details" sub="Address, contact, slogan, welcome and thank-you notes" value="Edit" onClick={() => setDetails(true)} />
-        <Opt t="Receipt template maker" sub={`${String(parsed.blocks.length)} blocks · ${String(parsed.paperWidth)} mm paper`} value="Edit" onClick={() => setTemplate(true)} />
+        <Opt t="Receipt details" sub="Address, contact, slogan, welcome and thank-you notes" value="Edit" onClick={() => { setDetails(true); }} />
+        <Opt t="Receipt template maker" sub={`${String(parsed.blocks.length)} blocks · ${String(parsed.paperWidth)} mm paper`} value="Edit" onClick={() => { setTemplate(true); }} />
         <PrinterSettings />
       </Group>
-      {details ? <DetailSheet onClose={() => setDetails(false)} /> : null}
-      {template ? <TemplateSheet onClose={() => setTemplate(false)} /> : null}
+      {details ? <DetailSheet onClose={() => { setDetails(false); }} /> : null}
+      {template ? <TemplateSheet onClose={() => { setTemplate(false); }} /> : null}
     </>
   );
 }
