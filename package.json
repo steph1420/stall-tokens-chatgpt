@@ -1,0 +1,54 @@
+{
+  "name": "stall-tokens",
+  "private": true,
+  "version": "2.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks || true",
+    "dev": "node scripts/stamp.mjs vite",
+    "build": "node scripts/stamp.mjs vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "depcruise": "depcruise src --config .dependency-cruiser.cjs",
+    "leak-scan": "node checks/leak-scan.mjs",
+    "check:build-output": "node checks/check-build-output.mjs",
+    "check:pins": "node checks/check-pins.mjs",
+    "check:ids": "node scripts/check-feature-ids.mjs",
+    "tokens": "node src/tokens/scripts/build.mjs",
+    "contrast": "node src/tokens/scripts/contrast.mjs",
+    "test": "node scripts/stamp.mjs vitest run",
+    "check": "npm run check:pins && npm run leak-scan && npm run check:build-output && npm run check:ids && npm run typecheck && npm run lint && npm run lint:css && npm run depcruise && npm run contrast && npm run test && npm run build"
+  },
+  "dependencies": {
+    "framer-motion": "12.43.0",
+    "qrcode-generator": "2.0.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zustand": "5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.65.1",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.0",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "@vitejs/plugin-react": "4.7.0",
+    "dependency-cruiser": "18.7.2",
+    "eslint": "10.15.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "fake-indexeddb": "6.2.8",
+    "jsdom": "26.1.0",
+    "stylelint": "18.0.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.2",
+    "vite": "6.4.1",
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "3.2.4"
+  }
+}
