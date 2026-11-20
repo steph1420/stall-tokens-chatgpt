@@ -79,7 +79,7 @@ export function escposRasterImage(width: number, height: number, data: Uint8Arra
 }
 
 /** Generic receipt encoder used by the template maker. No third-party print service, app-added text or forced cutter command. */
-export function escposReceipt(rows: readonly PrintableRow[], paperWidth: 58 | 80 = 58, cutPaper = false): Uint8Array {
+export function escposReceipt(rows: readonly PrintableRow[], paperWidth: 58 | 80 = 58, cutPaper = false, feedLines = 4): Uint8Array {
   const cols = columnsFor(paperWidth);
   const out: number[] = [0x1b, 0x40];
   const cmd = (...bytes: number[]) => { out.push(...bytes); };
@@ -106,7 +106,7 @@ export function escposReceipt(rows: readonly PrintableRow[], paperWidth: 58 | 80
     if (row.type === 'divider') { write('-'.repeat(cols)); continue; }
     writeText(row);
   }
-  cmd(0x1b, 0x64, 4);
+  cmd(0x1b, 0x64, Math.max(0, Math.min(10, Math.trunc(feedLines))));
   if (cutPaper) cmd(0x1d, 0x56, 0x42, 0x00);
   return Uint8Array.from(out);
 }
