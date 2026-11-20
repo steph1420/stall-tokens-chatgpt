@@ -10,6 +10,7 @@ import { istDate, rollover } from './rules/day';
 import { nextToken } from './rules/tokens';
 import type { PayDraft, UiState } from './ui';
 import { holding } from './rules/handling';
+import { menuUnitPrice } from './rules/catalog';
 
 /** Q-DRAFT-SYNC device label: serving name + short device id, e.g. "Ravi · 3f9a". */
 export const deviceLabel = (servingName: string, deviceId: string): string =>
@@ -132,17 +133,31 @@ function lineActions(x: Ctx, nav: Nav) {
   const { core, log, st, toast, current, available, editable } = x;
   const self = {
     /** Tap a menu card: +1 (F-06). */
-    addItem(itemId: string) {
+    addItem(itemId: string, options: { variantId?: string; addonIds?: readonly string[] } = {}) {
       if (x.locked()) return;
       const it = st().folded.items[itemId];
       if (!it || it.removed || it.supply) return;
       if (it.soldOut || available(itemId) < 1) { toast(`${it.name} is sold out`); return; }
+      const addonIds = [...new Set(options.addonIds ?? [])].sort();
+      const variant = (it.variants ?? []).find((v) => v.id === options.variantId);
+      if ((it.variants ?? []).length > 0 && !variant) { toast('Choose a variant first'); return; }
+      const unitPrice = menuUnitPrice(it, variant?.id, addonIds);
+      if (unitPrice === null) { toast('Check the selected options'); return; }
+      const addonNames = addonIds.map((id) => (it.addons ?? []).find((a) => a.id === id)?.name).filter((name): name is string => !!name);
+      const lineName = [it.name, variant?.name, ...(addonNames.length ? ['+ ' + addonNames.join(', ')] : [])].filter(Boolean).join(' · ');
       const o = current() ?? ensureOrder(x, nav);
       if (!o) { if (st().ui.sheet?.kind === 'newDay') x.ui({ pendingItem: itemId }); return; }
-      const draft = [...o.lines].reverse().find((l) => l.itemId === itemId && l.status === 'draft');
+      const draft = [...o.lines].reverse().find((l) =>
+        l.itemId === itemId && l.status === 'draft' && (l.variant ?? '') === (variant?.name ?? '')
+        && JSON.stringify([...(l.addons ?? [])].sort()) === JSON.stringify(addonNames.slice().sort()));
       if (draft) { self.setQty(draft.lineId, draft.qty + 1); return; }
       if (o.lines.length >= CONFIG.limits.linesMax) { toast('This order is full; start another one'); return; }
-      log.dispatch('line.add', { orderId: o.id, lineId: core.env.makeId(), itemId, name: it.name, price: it.price, category: it.category, stationId: it.stationId, qty: 1 });
+      log.dispatch('line.add', {
+        orderId: o.id, lineId: core.env.makeId(), itemId, name: lineName, price: unitPrice,
+        category: it.category, stationId: it.stationId, qty: 1,
+        ...(variant ? { variant: variant.name } : {}), ...(addonNames.length ? { addons: addonNames } : {}),
+        ...(it.unit ? { unit: it.unit } : {}),
+      });
     },
     /** Menu −: take one off the newest line of this item that is not being made yet. */
     removeItem(itemId: string) {
