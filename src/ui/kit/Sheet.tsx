@@ -24,6 +24,8 @@ function trapFocus(e: KeyboardEvent, el: HTMLElement) {
 
 export function Sheet({ title, onClose, children, label }: { title?: string; label?: string; onClose: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     const el = ref.current;
     if (el) {
@@ -37,12 +39,16 @@ export function Sheet({ title, onClose, children, label }: { title?: string; lab
       }
     }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') closeRef.current();
       else if (el) trapFocus(e, el);
     };
     window.addEventListener('keydown', onKey);
     return () => { window.removeEventListener('keydown', onKey); };
-  }, [onClose]);
+  // This effect must run only when the sheet mounts. `onClose` is often an inline callback;
+  // depending on it re-runs the effect on every keystroke, refocuses the dialog button and
+  // steals focus from the input. On mobile that dismisses the virtual keyboard.
+  // The ref keeps Escape handling current without resetting focus.
+  }, []);
   const { y, handle } = useSheetDrag(onClose);
   return (
     <div className={s.sheetWrap}>
