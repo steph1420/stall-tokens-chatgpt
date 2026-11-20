@@ -168,6 +168,58 @@ function ItemSheet({ itemId }: { itemId: string | null }) {
     </Sheet>
   );
 }
+
+function MenuOptionsSheet({ itemId }: { itemId: string }) {
+  const close = useClose();
+  const it = useApp((st) => st.folded.items[itemId]);
+  const counter = useApp((st) => st.counter);
+  const [variantId, setVariantId] = useState(it?.variants?.[0]?.id ?? '');
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  if (!it) return null;
+  const addons = it.addons ?? [];
+  const variants = it.variants ?? [];
+  const selectedIds = addons.filter((x) => selected[x.id]).map((x) => x.id);
+  const price = cats.menuUnitPrice(it, variantId || undefined, selectedIds);
+  const unit = it.unit ? ` per ${it.unit}` : '';
+  const toggle = (id: string, checked: boolean) => setSelected((p) => ({ ...p, [id]: checked }));
+  return (
+    <Sheet title={`Customise ${it.name}`} onClose={close}>
+      {variants.length > 0 ? (
+        <Field id="menu-variant" label="Choose a variant">
+          <select id="menu-variant" className={k.input} value={variantId} onChange={(e) => setVariantId(e.target.value)}>
+            <option value="">Choose…</option>
+            {variants.map((v) => <option key={v.id} value={v.id}>{v.name}{v.priceDelta ? ` · ${formatInr(v.priceDelta, { symbol: true })}` : ''}</option>)}
+          </select>
+        </Field>
+      ) : null}
+      {addons.length > 0 ? (
+        <div className={k.field}>
+          <span className={k.fieldLab}>Add-ons (optional)</span>
+          {addons.map((addon) => (
+            <label key={addon.id} className={k.row} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>{addon.name}{addon.priceDelta ? ` · +${formatInr(addon.priceDelta)}` : ''}</span>
+              <input type="checkbox" checked={!!selected[addon.id]} onChange={(e) => toggle(addon.id, e.target.checked)} />
+            </label>
+          ))}
+        </div>
+      ) : null}
+      {it.secondaryUnit ? <p className={k.hint}>{`1 ${it.unit || 'unit'} = ${String(it.secondaryUnitsPerPrimary ?? 1)} ${it.secondaryUnit}`}</p> : null}
+      <div className={k.row} style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <span className={k.fieldLab}>Unit price{unit}</span>
+        <strong>{price === null ? 'Choose a variant' : formatInr(price)}</strong>
+      </div>
+      <div className={k.row}>
+        <button type="button" className={k.quiet} onClick={close}>Cancel</button>
+        <span className={k.grow} />
+        <button type="button" className={k.cta} disabled={price === null} onClick={() => {
+          counter.addItem(itemId, { variantId: variantId || undefined, addonIds: selectedIds });
+          close();
+        }}>Add to order</button>
+      </div>
+    </Sheet>
+  );
+}
+
 function StockSheet({ itemId }: { itemId: string }) {
   const close = useClose();
   const it = useApp((st) => st.folded.items[itemId]);
@@ -423,6 +475,7 @@ export function CounterSheets() {
   switch (sheet.kind) {
     case 'item': return <ItemSheet key={sheet.itemId ?? 'new'} itemId={sheet.itemId} />;
     case 'stock': return <StockSheet itemId={sheet.itemId} />;
+    case 'menuOptions': return <MenuOptionsSheet itemId={sheet.itemId} />;
     case 'lineNote': return <NoteSheet key={sheet.lineId} lineId={sheet.lineId} />;
     case 'orderNote': return <NoteSheet lineId={null} />;
     case 'adjust': return <AdjustSheet />;
