@@ -33,7 +33,6 @@ for (const theme of ['night', 'day']) {
   await sp0.route(/\/stall-tokens\/.*\.(js|webmanifest)$/, (r) => r.abort());
   await sp0.goto(STABLE); const stableTitle = await sp0.title();
   await p.goto(BETA);
-  const before = await scan(p);
   await seed(p, theme); await p.reload(); await p.waitForTimeout(600);
   await step(T('launch shows Beta title and stations'), async () => { await shot('01-launch'); return (await p.title()) === 'Stall Tokens Beta' ? `title "${await p.title()}"` : false; });
   await step(T('take an order: Tea ×2 + Samosa'), async () => {
@@ -96,12 +95,17 @@ for (const theme of ['night', 'day']) {
     await p2.close();
     return after2 > before2 ? `Cold Drink on tab 2 kitchen: ${String(before2)} → ${String(after2)}` : false;
   });
-  await step(T('Stable storage untouched: no stall-tokens.v2.* key or DB on the origin'), async () => {
+  await step(T('Beta storage remains isolated from Stable'), async () => {
     const after = await scan(p);
-    const stable = [...after.ls, ...after.dbs].filter((k) => k.startsWith('stall-tokens.v2'));
-    const betaOnly = [...after.ls, ...after.dbs].every((k) => k.startsWith('stall-tokens-beta.v2'));
+    const keys = [...after.ls, ...after.dbs];
+    const betaOnly = keys.every((k) => k.startsWith('stall-tokens-beta.v2'));
+    if (!betaOnly) return false;
+    // A local preview has a different origin from GitHub Pages; browser storage cannot be compared across those origins.
+    const originOf = (url) => url.match(/^https?:\/\/[^/]+/i)?.[0] ?? '';
+    if (originOf(BETA) !== originOf(STABLE)) return `local preview origin contains only Beta-prefixed storage: ${JSON.stringify(after)}`;
+    const stable = keys.filter((k) => k.startsWith('stall-tokens.v2'));
     await sp0.reload(); const sAfter = await scan(sp0); await sp0.close();
-    return stable.length === 0 && betaOnly && JSON.stringify(sAfter) === JSON.stringify(after) ? `Stable tab "${stableTitle}" open in same profile; before ${JSON.stringify(before)} · after ${JSON.stringify(after)}` : false;
+    return stable.length === 0 && JSON.stringify(sAfter) === JSON.stringify(after) ? `Stable tab "${stableTitle}" shares the app origin; storage remained Beta-only: ${JSON.stringify(after)}` : false;
   });
   await step(T('no page errors'), async () => (errors.length === 0 ? 'none' : false));
   await ctx.close();

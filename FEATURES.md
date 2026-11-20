@@ -15,7 +15,7 @@ Every feature has a row before work starts. IDs appear in code (`// F-xx`) and i
 | F-10 | Discount (₹ or %, allowed by, note) | billing.html, spec order rules | LIVE (v2.0.0) | src/store/rules/bill.test.ts | change |
 | F-11 | Round-off at billing, both ways | Q-ROUND-1 A | LIVE (v2.0.0) | bill.test.ts | planned |
 | F-12 | To kitchen (unpaid send) / Pay sends too | Q-POLISH-SET1 wording | LIVE (v2.0.0) | src/store/counter.test.ts (store); UI none yet | change |
-| F-13 | Tokens per day, Counter ranges (1–500, 501+) | D-TOKEN | LIVE (v2.0.0) | src/store/rules/tokens.test.ts | change |
+| F-13 | Tokens per day, Counter ranges (1–500, 501+); deleting an order releases its trailing token for reuse, while earlier gaps below later-issued tokens are not backfilled | D-TOKEN, ADR-0004 | LIVE (v2.0.0) | src/store/rules/tokens.test.ts | change |
 | F-14 | Payment: To collect, Cash/UPI split, numpad, slider ₹10 snap, Waived row | 20-polish/payment.html, 03-payment v5 | LIVE (v2.0.0) | src/store/rules/pay.test.ts, e2e | change |
 | F-15 | Dynamic UPI QR (upi://pay pa pn am tn), named payees | payment.html, Q-UPI-1 A (manual confirm) | LIVE (v2.0.0) | src/store/rules/upi.test.ts | change |
 | F-16 | Count notes (₹5–500, More notes), cash received, change | payment.html | LIVE (v2.0.0) | pay.test.ts | change |

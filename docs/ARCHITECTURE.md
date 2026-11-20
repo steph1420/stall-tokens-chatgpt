@@ -171,7 +171,7 @@ Night (`stall-night`) and day (`stall-day`) at every row. Contrast for every the
 - "V2 is live. V1 never used": **D-MIGRATE dropped** (no v1 import code, screen or tests) and **D-HOST changed**: no `/beta/` path; v2 replaces v1 at the main address once every test passes. v1 is kept as `legacy/v1/index.html`, tag `v1.0.0` and branch `backup/pre-v2.0.0`.
 - Bluetooth local sync is backlog; the sync layer is a pluggable transport (§4.3).
 - ADR numbering: the starter already uses ADR-0002 (framer-motion pin), so the plan's "ADR-0002 accent" is `ADR-0003-stall-accent.md`.
-- Tokens are issued when an order is opened (the locked strip shows `#048 New`), not when it is placed; a deleted order leaves a gap in the numbers.
+- Tokens are issued when an order is opened (the locked strip shows `#048 New`), not when it is placed. Deleting an order releases its number: the allocator ignores deleted-order tombstones and continues from the highest non-deleted token in that day and device range. A deleted trailing token is reused next; earlier gaps below later-issued tokens are not backfilled, preserving ascending allocation.
 
 ## 11. Decisions
 - ADR-0001: one styling system, Driftline tokens + CSS Modules.
