@@ -67,6 +67,9 @@ export interface DevicePrefs {
   countNotesOpen: boolean;
   /** Q-KITCHEN-ALERT: Chime + flash with selectable tone (Steve locked). */
   alertTone: 'chime' | 'bell' | 'pluck' | 'harp';
+  /** Remembered per-device browser printer choice; permissions may still need reacquisition. */
+  printerKind: 'none' | 'bluetooth-le' | 'usb';
+  printerId: string;
   /** Switch delay in seconds (0..10) before station starts cooking next order. Default: 2. */
   nextOrderDelaySec: number;
 }
