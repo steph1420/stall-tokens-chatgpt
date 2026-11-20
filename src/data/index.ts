@@ -21,6 +21,7 @@ export { createSheetTransport, isSheetUrl, type SheetConfig } from './adapters/s
 export { createSyncStateStore } from './adapters/syncState';
 export { joinUrl, readJoin, isRole, type JoinLink } from './join';
 export { bluetoothPrint, canBluetoothPrint } from './adapters/btPrinter';
+export { canUsbPrint, selectBluetoothPrinter, selectUsbPrinter, bluetoothPrint as printBluetoothBytes, usbPrint, printToSelectedPrinter, disconnectPrinter, selectedPrinter, testPrintBytes, type PrinterChoice } from './adapters/printTransport';
 export { dropReceipt, getReceipt, putReceipt, receiptIds } from './adapters/receipts';
 export { backupFilename, createBackupData, computeOpLogHash, parseBackupJson, triggerFileDownload } from './adapters/backupFile';
 export { createIdbSnapshotsStore, createMemorySnapshotsStore } from './adapters/snapshots';
