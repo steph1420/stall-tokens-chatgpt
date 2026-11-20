@@ -23,16 +23,19 @@ function itemActions(core: Core, log: Log) {
       const swatch = Math.abs(Math.trunc(d.swatch)) % CONFIG.swatchCount;
       const previous = itemId ? st().folded.items[itemId] : undefined;
       const cleanOptions = (options: readonly MenuPriceOption[] | undefined): readonly MenuPriceOption[] => (options ?? []).slice(0, 30)
-        .map((x) => ({ id: x.id.trim().slice(0, 80), name: x.name.trim().replace(/\\s+/g, ' ').slice(0, 60), priceDelta: Math.trunc(x.priceDelta) }))
+        .map((x) => ({ id: x.id.trim().slice(0, 80), name: x.name.trim().replace(/\s+/g, ' ').slice(0, 60), priceDelta: Math.trunc(x.priceDelta) }))
         .filter((x) => x.id && x.name && Number.isSafeInteger(x.priceDelta) && Math.abs(x.priceDelta) <= CONFIG.limits.moneyMaxPaise);
       const addons = cleanOptions(d.addons ?? previous?.addons);
       const variants = cleanOptions(d.variants ?? previous?.variants);
       if ((d.addons ?? previous?.addons ?? []).length !== addons.length || (d.variants ?? previous?.variants ?? []).length !== variants.length) return 'Check add-on and variant names and prices';
       const discountKind = d.discountKind ?? previous?.discountKind ?? 'none';
-      const discountValue = Math.max(0, Math.trunc(d.discountValue ?? previous?.discountValue ?? 0));
+      const rawDiscount = d.discountValue ?? previous?.discountValue ?? 0;
+      if (!Number.isSafeInteger(rawDiscount) || rawDiscount < 0) return 'Check the item discount';
+      const discountValue = rawDiscount;
       if ((discountKind === 'pct' && discountValue > 100) || (discountKind === 'amount' && discountValue > d.price)) return 'Check the item discount';
-      const secondaryUnitsPerPrimary = Math.max(1, Math.trunc(d.secondaryUnitsPerPrimary ?? previous?.secondaryUnitsPerPrimary ?? 1));
-      if (secondaryUnitsPerPrimary > 100000) return 'Check the unit conversion';
+      const rawConversion = d.secondaryUnitsPerPrimary ?? previous?.secondaryUnitsPerPrimary ?? 1;
+      if (!Number.isSafeInteger(rawConversion) || rawConversion < 1 || rawConversion > 100000) return 'Check the unit conversion';
+      const secondaryUnitsPerPrimary = rawConversion;
       log.dispatch('item.set', { itemId: id, fields: {
         name, price: d.price, swatch, category: d.category.trim(), stationId: d.stationId, count: d.count,
         unit: (d.unit ?? previous?.unit ?? '').trim().slice(0, 20),
@@ -100,7 +103,7 @@ function payeeActions(core: Core, log: Log) {
     },
     /** Shared stall settings (stall name). Trimmed and length-capped. */
     setSetting(key: string, value: string) {
-      const content = key === 'printTemplate' ? value : value.trim().replace(/\\s+/g, ' ');
+      const content = key === 'printTemplate' ? value : value.trim().replace(/\s+/g, ' ');
       const limit = key === 'printTemplate' ? 200_000 : CONFIG.limits.recordTextMax;
       log.dispatch('setting.set', { key, value: content.slice(0, limit) });
     },
