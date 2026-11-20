@@ -1,0 +1,95 @@
+/* Station page (21-polish2/station.html) and looks B / C (Q-STN-LOOK D). `--c` is the station colour. */
+.title { grid-column: 2; grid-row: 2; margin: 0; display: flex; align-items: center; gap: 0.625rem; min-width: 0; }
+.title span { font-family: var(--dl-stall-font-display); font-size: 1.375rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1; color: var(--dl-color-text-display); }
+.titleIc svg { width: 1.75rem; height: 1.75rem; display: block; stroke: var(--c); }
+
+.tabWrap { display: flex; align-items: center; position: relative; width: 100%; min-width: 0; padding: 0 0.5rem; }
+.cycleBtn {
+  flex: none; width: 2.25rem; height: 3.25rem; display: grid; place-items: center;
+  color: var(--dl-color-text-muted); background: transparent; border: 0;
+  cursor: pointer;
+}
+.cycleBtn svg { width: 1rem; height: 1rem; }
+.cycleBtn:disabled { opacity: 0.25; cursor: default; }
+.cycleBtnR { composes: cycleBtn; }
+.cycleBtnR svg { transform: scaleX(-1); }
+
+.otabs { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.5rem 0.75rem; overflow-x: auto; scrollbar-width: none; }
+.otabs::-webkit-scrollbar { display: none; }
+.otab {
+  --tab: var(--dl-color-accent);
+  flex: none; height: 3.25rem; padding: 0 0.875rem 0 1rem; border-radius: 1.125rem; display: flex; align-items: center; gap: 0.5rem;
+  background: color-mix(in srgb, var(--dl-color-surface) 80%, transparent); color: var(--dl-color-text-muted);
+}
+.otab[data-mark="priority"] { --tab: var(--dl-stall-st-priority); }
+.otab[data-mark="done?"] { --tab: var(--dl-stall-st-done); }
+.otab[data-mark="preparing"] { --tab: var(--dl-stall-st-preparing); }
+.otab[data-mark="ready"] { --tab: var(--dl-stall-st-ready); }
+.otab[data-mark="held"] { --tab: var(--dl-stall-st-held); }
+.tok { font-family: var(--dl-stall-font-display); font-weight: var(--dl-stall-num-weight); font-size: 1.25rem; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.otabOn { background: color-mix(in srgb, var(--tab) 22%, var(--dl-color-surface)); }
+.otabOn .tok { color: var(--dl-color-text-display); font-weight: 400; }
+.otabPaused { opacity: 0.55; }
+
+.body { flex: 1; min-height: 0; overflow-y: auto; padding: 0.75rem 1rem 1.75rem; display: flex; flex-direction: column; touch-action: pan-y; }
+
+/* Look B: item cards */
+.look, .ticket { display: flex; flex-direction: column; gap: 0.75rem; }
+.lookH, .tickH { display: flex; align-items: baseline; justify-content: space-between; padding: 0 0.25rem; }
+.igrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.625rem; }
+.icard {
+  position: relative; display: flex; flex-direction: column; gap: 0.25rem; min-height: 8.5rem; padding: 0.875rem 0.875rem 0.75rem 1.125rem;
+  border-radius: var(--dl-radius-lg); background: color-mix(in srgb, var(--c) 10%, var(--dl-color-surface));
+  box-shadow: inset 0 0 0 var(--dl-stall-hair) color-mix(in srgb, var(--c) 26%, var(--dl-color-hairline)), var(--dl-stall-card-edge), var(--dl-stall-card-lift);
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; cursor: pointer;
+}
+.icard::before { content: ""; position: absolute; left: 0; top: 0.875rem; bottom: 0.875rem; width: var(--dl-stall-accent-bar); border-radius: var(--dl-radius-pill); background: var(--c); }
+.iqty { font-family: var(--dl-stall-font-display); font-weight: var(--dl-stall-num-weight); font-size: 2.5rem; line-height: 1; color: var(--dl-color-text-display); }
+.iname { font-family: var(--dl-stall-font-display); font-size: 1.0625rem; font-weight: 500; color: var(--dl-color-text); }
+.inote { font-size: 0.9375rem; color: var(--dl-color-text); overflow-wrap: anywhere; } /* W-26 W-39 */
+.inote::before { content: "✎ "; color: var(--dl-color-text-muted); }
+.istate { margin-top: auto; }
+.icardDone { background: color-mix(in srgb, var(--dl-color-warning) 14%, var(--dl-color-surface)); }
+.icardHanded { opacity: 0.45; }
+
+/* Look C: kitchen ticket */
+.ticket {
+  padding: 1rem 1rem 0.75rem; border-radius: var(--dl-radius-md); background: var(--dl-color-surface-raised);
+  box-shadow: inset 0 0 0 var(--dl-stall-hair) var(--dl-color-hairline), var(--dl-stall-card-lift);
+}
+.tickH { padding-bottom: 0.625rem; border-bottom: var(--dl-stall-hair-2) dashed var(--dl-color-hairline); }
+.tlist { list-style: none; margin: 0; padding: 0; }
+.trow {
+  display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 0.5rem; padding: 0.75rem 0.25rem;
+  border-bottom: var(--dl-stall-hair) dashed var(--dl-color-hairline); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+}
+.trow:last-child { border-bottom: 0; }
+.trowDone { background: color-mix(in srgb, var(--dl-color-warning) 12%, transparent); border-radius: var(--dl-radius-sm); }
+.tqty { font-family: var(--dl-stall-font-display); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--dl-color-text-display); }
+.tname { display: flex; flex-direction: column; font-size: 1.0625rem; font-weight: 500; color: var(--dl-color-text); }
+.tname small { display: block; font-size: 0.9375rem; font-weight: 400; color: var(--dl-color-text); } /* W-26 W-39 */
+.tname small::before { content: "✎ "; color: var(--dl-color-text-muted); }
+
+.others { list-style: none; margin: 0; padding: 0.25rem 0.25rem 0; display: flex; flex-direction: column; gap: 0.375rem; opacity: 0.55; }
+.others li { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding-left: 0.625rem; font-size: 0.875rem; color: var(--dl-color-text-muted); border-left: var(--dl-stall-accent-bar) solid var(--c); }
+
+/* Overview sheet */
+.ovItems { list-style: none; margin: 0 0 0.75rem; padding: 0; display: flex; flex-direction: column; gap: 0.375rem; }
+.ovItems li { display: flex; align-items: baseline; gap: 0.625rem; font-size: 1rem; color: var(--dl-color-text); }
+.ovItems b { min-width: 2rem; text-align: right; font-family: var(--dl-stall-font-display); font-size: 1.375rem; font-weight: var(--dl-stall-num-weight); color: var(--dl-color-text-display); }
+.ovNone { color: var(--dl-color-text-faint); }
+.ovSplit { display: flex; flex-wrap: wrap; gap: 0.5rem 0.875rem; margin-bottom: 1rem; }
+.ovChip { display: inline-flex; align-items: center; gap: 0.375rem; }
+.ovChip b { font-weight: 600; color: var(--dl-color-text); }
+/* W-28 / W-41: a Priority order elsewhere in the list: a banner to open it, never a swap under the finger. */
+.priBanner {
+  display: flex; align-items: center; gap: 0.5rem; margin: 0 1rem 0.625rem; min-height: var(--dl-hit-min); padding: 0 0.875rem; border-radius: 0.875rem;
+  font-weight: 600; color: var(--dl-color-text-display); background: color-mix(in srgb, var(--dl-stall-st-priority) 18%, var(--dl-color-surface));
+}
+.priBanner b { margin-left: auto; color: var(--dl-color-accent); }
+/* W-38 PK-2: the look headers carry the same facts as the Full card. */
+.lookH, .tickH { flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+@container counter (max-width: 24rem) {
+    .body { flex: none; overflow: visible; }
+  .title span { line-height: 1.15; overflow-wrap: anywhere; }
+}
