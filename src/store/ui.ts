@@ -71,6 +71,7 @@ export interface UiState {
   readonly nextCheckAt: number;
   /** W-22: the menu item tapped when the new-day question opened (added after the answer); '' = none. */
   readonly pendingItem: string;
+  readonly pendingItemOptions: { readonly variantId?: string; readonly addonIds?: readonly string[] } | null;
   /** W-22: IST date on which "Keep yesterday's day" was chosen ('' = not asked). */
   readonly dayKept: string;
 }
