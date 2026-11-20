@@ -212,7 +212,7 @@ function MenuOptionsSheet({ itemId }: { itemId: string }) {
         <button type="button" className={k.quiet} onClick={close}>Cancel</button>
         <span className={k.grow} />
         <button type="button" className={k.cta} disabled={price === null} onClick={() => {
-          counter.addItem(itemId, { variantId: variantId || undefined, addonIds: selectedIds });
+          counter.addItem(itemId, { ...(variantId ? { variantId } : {}), addonIds: selectedIds });
           close();
         }}>Add to order</button>
       </div>
