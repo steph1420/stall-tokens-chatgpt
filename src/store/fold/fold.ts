@@ -8,7 +8,8 @@ import { lww } from './lww';
 import { applyMoneyOp, MONEY_KINDS, type MoneyKind } from './money';
 
 const ITEM_DEFAULTS: ItemFields = {
-  name: '', price: 0, swatch: 0, category: '', stationId: '', count: null, unit: '', lowAt: 0, soldOut: false, order: 0, removed: false, supply: false, categoryId: '',\n  addons: [], variants: [], secondaryUnit: '', secondaryUnitsPerPrimary: 1, discountKind: 'none', discountValue: 0,
+  name: '', price: 0, swatch: 0, category: '', stationId: '', count: null, unit: '', lowAt: 0, soldOut: false, order: 0, removed: false, supply: false, categoryId: '',
+  addons: [], variants: [], secondaryUnit: '', secondaryUnitsPerPrimary: 1, discountKind: 'none', discountValue: 0,
 };
 
 function fieldOk(key: keyof ItemFields, value: unknown): boolean {
