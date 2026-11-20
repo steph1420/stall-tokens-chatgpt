@@ -67,6 +67,7 @@ function CurrentLine() {
 function HeaderEnd({ settled }: { settled: boolean }) {
   const c = useApp((st) => st.counter);
   const openSheet = useApp((st) => st.openSheet);
+  const go = useApp((st) => st.go);
   const drafts = useApp((st) => draftOrders(liveOrders(st.folded)).filter((o) => o.id !== st.ui.orderId).length);
   return (
     <div className={s.hdrEnd}>
@@ -146,6 +147,7 @@ export function CounterShell() {
       <header className={s.chrome}>
         <div className={s.hdrTop}>
           <div className={s.kicker}>{stallName}</div>
+          <button type="button" className={s.btnMore} aria-label="Home" title="Home" onClick={() => { go('launch'); }}><Icon name="home" /></button>
           <button type="button" className={s.btnMore} aria-label="More" onClick={() => { openSheet({ kind: 'more' }); }}><Icon name="more" /></button>
         </div>
         <TopTabs />
