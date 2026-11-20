@@ -129,7 +129,7 @@ export function TokenSlipPrint({ o, tip, waived, onDone }: { o: Order; tip?: Pai
     setMsg('Preparing receipt…');
     try {
       const prepared = await prepareRows(receipt.rows);
-      const data = escposReceipt(prepared, receipt.template.paperWidth, false);
+      const data = escposReceipt(prepared, receipt.template.paperWidth, receipt.template.cutPaper ?? false, receipt.template.feedLines ?? 4);
       setMsg('Sending to printer…');
       await printToSelectedPrinter(data, printer.kind);
       setMsg('Receipt sent to printer');
