@@ -112,7 +112,7 @@ export async function selectUsbPrinter(): Promise<PrinterChoice> {
   // The USB Printer Class filter is intentionally conservative; some vendor-specific printers need a native driver bridge.
   await openUsb(device);
   usbDevice = device;
-  return { kind: 'usb', id: `${device.vendorId}:${device.productId}`, name: usbLabel(device), vendorId: device.vendorId, productId: device.productId };
+  return { kind: 'usb', id: `${String(device.vendorId)}:${String(device.productId)}`, name: usbLabel(device), vendorId: device.vendorId, productId: device.productId };
 }
 
 async function openUsb(device: UsbDevice): Promise<void> {
@@ -134,8 +134,8 @@ async function openUsb(device: UsbDevice): Promise<void> {
         usbEndpoint = endpoint.endpointNumber;
         usbInterface = intf.interfaceNumber;
         return;
-      } catch {
-        // Try the next interface; printers sometimes expose a non-printing USB interface first.
+      } catch (error) {
+        console.warn('USB interface could not be claimed; trying the next interface', error);
       }
     }
   }
@@ -175,7 +175,7 @@ export async function disconnectPrinter(): Promise<void> {
 
 export function selectedPrinter(): PrinterChoice | null {
   if (bleDevice && bleChar) return { kind: 'bluetooth-le', id: bleDevice.id, name: bleDevice.name || 'Bluetooth printer' };
-  if (usbDevice && usbEndpoint !== null) return { kind: 'usb', id: `${usbDevice.vendorId}:${usbDevice.productId}`, name: usbLabel(usbDevice), vendorId: usbDevice.vendorId, productId: usbDevice.productId };
+  if (usbDevice && usbEndpoint !== null) return { kind: 'usb', id: `${String(usbDevice.vendorId)}:${String(usbDevice.productId)}`, name: usbLabel(usbDevice), vendorId: usbDevice.vendorId, productId: usbDevice.productId };
   return null;
 }
 
