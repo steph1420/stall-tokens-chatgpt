@@ -85,6 +85,7 @@ export function parseReceiptTemplate(raw: string | undefined): ReceiptTemplate {
   }
 }
 
+// eslint-disable-next-line max-lines-per-function -- one ordered pass keeps the receipt template deterministic.
 export function buildReceiptRows(template: ReceiptTemplate, context: ReceiptContext): ReceiptRow[] {
   const rows: ReceiptRow[] = [];
   for (const block of template.blocks) {
@@ -93,7 +94,7 @@ export function buildReceiptRows(template: ReceiptTemplate, context: ReceiptCont
     if (block.type === 'items') {
       for (const item of context.items) {
         const unit = block.showUnit === false || !item.unit ? '' : ` ${item.unit}`;
-        const qty = block.showQty === false ? '' : `${item.quantity} × `;
+        const qty = block.showQty === false ? '' : `${String(item.quantity)} × `;
         const showAmount = block.showAmount !== false;
         rows.push({
           type: 'text',
