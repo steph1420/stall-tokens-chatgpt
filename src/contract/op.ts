@@ -16,6 +16,8 @@ export interface EntryBody {
   personId: string | null;
 }
 
+export interface MenuPriceOption { readonly id: string; readonly name: string; readonly priceDelta: Paise }
+
 export interface ItemFields {
   name: string; price: Paise; swatch: number; category: string; stationId: string;
   count: number | null; unit: string; lowAt: number; soldOut: boolean; order: number; removed: boolean;
@@ -23,6 +25,15 @@ export interface ItemFields {
   supply: boolean;
   /** P-3 A (2.1.0): category record id (`name:<text>` for a virtual one). '' = use the legacy `category` text. Additive. */
   categoryId: string;
+  /** POS item customisations: variant and add-on price adjustments are per unit, stored in paise. */
+  addons?: readonly MenuPriceOption[];
+  variants?: readonly MenuPriceOption[];
+  /** Secondary unit conversion: number of secondary units per one primary unit. */
+  secondaryUnit?: string;
+  secondaryUnitsPerPrimary?: number;
+  /** Default item-level discount applied before option price adjustments. */
+  discountKind?: 'none' | 'amount' | 'pct';
+  discountValue?: number;
 }
 /** Q-REFUND-1 A: one refunded line (qty of that line). */
 export interface RefundLine { lineId: string; qty: number }
@@ -38,7 +49,7 @@ export interface Bodies {
   'day.start': { dayId: string; label: string };
   /** `device` (2.1.0, optional, Q-DRAFT-SYNC): the device label, so every Counter sees whose draft it is. */
   'order.create': { orderId: string; dayId: string; token: number; servedBy: string; device?: string };
-  'line.add': { orderId: string; lineId: string; itemId: string; name: string; price: Paise; category: string; stationId: string; qty: number };
+  'line.add': { orderId: string; lineId: string; itemId: string; name: string; price: Paise; category: string; stationId: string; qty: number; variant?: string; addons?: string[]; unit?: string };
   'line.qty': { orderId: string; lineId: string; qty: number };
   'line.note': { orderId: string; lineId: string; note: string };
   'line.status': { orderId: string; lineId: string; status: LineStatus };
@@ -178,7 +189,7 @@ const S: Record<OpKind, Record<string, FieldType>> = {
   'order.release': { orderId: 's', deviceId: 's', reason: 's' },
 };
 /** Optional fields (additive, 2.1.0): absent is fine; present must have the right type. */
-const OPTIONAL: Partial<Record<OpKind, Record<string, FieldType>>> = {
+const OPTIONAL: Partial<Record<OpKind, Record<string, FieldType>>> = {\n  'line.add': { variant: 's', addons: 'a', unit: 's' },
   'order.create': { device: 's' },
   'refund.add': { reason: 's', lines: 'a', restock: 'b' },
 };
@@ -200,5 +211,5 @@ export function isValidOp(value: unknown): value is Op {
   if (!Object.entries(S[value.kind]).every(([k, t]) => okField(t, body[k]))) return false;
   const opt = OPTIONAL[value.kind] ?? {};
   if (!Object.entries(opt).every(([k, t]) => body[k] === undefined || okField(t, body[k]))) return false;
-  return value.kind !== 'refund.add' || body.lines === undefined || isRefundLines(body.lines);
+  return (value.kind !== 'refund.add' || body.lines === undefined || isRefundLines(body.lines))\n    && (value.kind !== 'line.add' || body.addons === undefined || (Array.isArray(body.addons) && body.addons.every((x) => typeof x === 'string')));
 }
