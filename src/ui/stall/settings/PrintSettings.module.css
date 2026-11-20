@@ -1,0 +1,20 @@
+.paper {
+  width: 58mm;
+  max-width: 100%;
+  margin: 0 auto 1rem;
+  padding: 4mm 5mm;
+  background: #fff;
+  color: #111;
+  font: 3.2mm/1.4 ui-monospace, Menlo, Consolas, monospace;
+}
+.paper h2 { margin: 0; font-size: 4mm; text-align: center; }
+.paper p { margin: 1mm 0; text-align: center; }
+.paperRule { border-bottom: 0.25mm dashed #111; margin: 2mm 0; }
+.paperTotal { display: flex; justify-content: space-between; font-weight: 700; }
+.printBtn { min-height: var(--dl-hit-comfortable); padding: 0 1rem; border-radius: var(--dl-radius-md); color: var(--dl-stall-on-cta); background: var(--dl-stall-cta); font-weight: 600; }
+@media print {
+  :global(body *) { visibility: hidden; }
+  .paper, .paper * { visibility: visible; }
+  .paper { position: absolute; left: 0; top: 0; margin: 0; box-shadow: none; }
+  .printBtn { display: none; }
+}
