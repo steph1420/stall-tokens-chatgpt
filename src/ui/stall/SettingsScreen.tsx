@@ -17,6 +17,7 @@ import { CategoriesRow } from './settings/CategoriesSettings';
 import { StationsRow } from './settings/StationsSettings';
 import { DataSettings } from './settings/DataSettings';
 import { AboutSettings } from './settings/AboutSettings';
+import { PrintSettings } from './settings/PrintSettings';
 
 const LOOKS = { full: 'Full card', items: 'Item cards', ticket: 'Ticket' } as const;
 
@@ -122,6 +123,7 @@ export function SettingsScreen() {
       <GeneralSettings />
       <DisplaySettings />
       <Group label="Menu"><CategoriesRow /><StationsRow /></Group>
+      <PrintSettings />
       <KitchenSettingsGroup />
       <MoneySettingsGroup />
       <Group label="Sync"><SyncRow /></Group>
