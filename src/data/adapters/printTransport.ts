@@ -22,7 +22,7 @@ interface BleApi {
   requestDevice(options: object): Promise<BleDevice>;
   getDevices?(): Promise<BleDevice[]>;
 }
-interface UsbEndpoint { readonly endpointNumber: number; readonly direction: 'in' | 'out'; readonly type: 'bulk' | 'interrupt' | ' isochronous' }
+interface UsbEndpoint { readonly endpointNumber: number; readonly direction: 'in' | 'out'; readonly type: 'bulk' | 'interrupt' | 'isochronous' }
 interface UsbAlternate { readonly alternateSetting: number; readonly endpoints: UsbEndpoint[] }
 interface UsbInterface { readonly interfaceNumber: number; readonly alternates: UsbAlternate[]; readonly claimed?: boolean }
 interface UsbConfiguration { readonly configurationValue: number; readonly interfaces: UsbInterface[] }
@@ -108,10 +108,8 @@ function usbLabel(device: UsbDevice): string {
 export async function selectUsbPrinter(): Promise<PrinterChoice> {
   const api = usbApi();
   if (!api || !canUsbPrint()) throw new Error('WebUSB is unavailable here. Use an AirPrint printer on iPad, or a browser that supports WebUSB.');
-  const device = await api.requestDevice({ filters: [{ classCode: 7 }, { vendorId: 0x0000 }] }).catch(async () => api.requestDevice({ filters: [{ classCode: 7 }], exclusionFilters: [] }).catch(() => api.requestDevice({ filters: [{ classCode: 7 }] })));
-  // A printer with a vendor-specific interface may not report USB Printer Class 7.
-  // Offer a broader picker only if the first class-specific picker was cancelled is intentionally avoided:
-  // a USB class filter can be narrowed by the browser and cannot be widened after selection without another gesture.
+  const device = await api.requestDevice({ filters: [{ classCode: 7 }] });
+  // The USB Printer Class filter is intentionally conservative; some vendor-specific printers need a native driver bridge.
   await openUsb(device);
   usbDevice = device;
   return { kind: 'usb', id: `${device.vendorId}:${device.productId}`, name: usbLabel(device), vendorId: device.vendorId, productId: device.productId };
