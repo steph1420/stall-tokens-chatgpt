@@ -64,16 +64,20 @@ export function parseReceiptTemplate(raw: string | undefined): ReceiptTemplate {
     const v: unknown = JSON.parse(raw);
     if (typeof v !== 'object' || v === null) return DEFAULT_RECEIPT_TEMPLATE;
     const x = v as Partial<ReceiptTemplate>;
-    if (x.version !== 1 || (x.paperWidth !== 58 && x.paperWidth !== 80) || !Array.isArray(x.blocks) || (x.feedLines !== undefined && (!Number.isInteger(x.feedLines) || x.feedLines < 0 || x.feedLines > 10))) return DEFAULT_RECEIPT_TEMPLATE;
+    if (x.version !== 1 || (x.paperWidth !== 58 && x.paperWidth !== 80) || !Array.isArray(x.blocks) || (x.feedLines !== undefined && (!Number.isInteger(x.feedLines) || x.feedLines < 0 || x.feedLines > 10)) || (x.cutPaper !== undefined && typeof x.cutPaper !== 'boolean')) return DEFAULT_RECEIPT_TEMPLATE;
     const allowed = new Set<string>(PRINT_VARIABLES.map(([key]) => key));
     const blocks = x.blocks.filter((b): b is ReceiptBlock => {
       if (typeof b !== 'object' || b === null || typeof b.id !== 'string' || typeof b.type !== 'string') return false;
-      if (b.type === 'divider' || b.type === 'items') return true;
-      if (b.type === 'text') return typeof b.text === 'string';
-      if (b.type === 'image') return typeof b.dataUrl === 'string' && b.dataUrl.startsWith('data:image/') && Number.isInteger(b.widthDots);
-      return b.type === 'variable' && typeof b.key === 'string' && allowed.has(b.key);
+      const alignOk = b.align === undefined || b.align === 'left' || b.align === 'center' || b.align === 'right';
+      const boolsOk = (b.bold === undefined || typeof b.bold === 'boolean') && (b.large === undefined || typeof b.large === 'boolean');
+      if (b.type === 'divider') return true;
+      if (b.type === 'items') return ['showQty', 'showUnit', 'showRate', 'showAmount', 'showItemNote'].every((k) =>
+        (b as Record<string, unknown>)[k] === undefined || typeof (b as Record<string, unknown>)[k] === 'boolean');
+      if (b.type === 'text') return typeof b.text === 'string' && alignOk && boolsOk;
+      if (b.type === 'image') return typeof b.dataUrl === 'string' && b.dataUrl.startsWith('data:image/') && b.dataUrl.length <= 40_000 && Number.isInteger(b.widthDots) && b.widthDots > 0 && b.widthDots <= 576;
+      return b.type === 'variable' && typeof b.key === 'string' && allowed.has(b.key) && alignOk && boolsOk;
     });
-    return { version: 1, paperWidth: x.paperWidth, blocks };
+    return { version: 1, paperWidth: x.paperWidth, cutPaper: x.cutPaper ?? false, feedLines: x.feedLines ?? 4, blocks };
   } catch {
     return DEFAULT_RECEIPT_TEMPLATE;
   }
