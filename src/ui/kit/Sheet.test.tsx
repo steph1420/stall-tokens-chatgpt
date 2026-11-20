@@ -67,4 +67,25 @@ describe('Sheet component (FIND-UI-04)', () => {
     expect(document.activeElement).not.toBe(input);
     expect(document.activeElement).toBe(doneBtn);
   });
+  it('keeps the active input focused when parent callbacks change during typing', () => {
+    const { rerender } = render(
+      <Sheet title="Keyboard" onClose={() => undefined}>
+        <input data-testid="typing-input" />
+        <button type="button">Done</button>
+      </Sheet>
+    );
+    const input = screen.getByTestId('typing-input');
+    input.focus();
+    expect(document.activeElement).toBe(input);
+
+    // Parent components commonly create a new inline onClose function on every render.
+    rerender(
+      <Sheet title="Keyboard" onClose={() => undefined}>
+        <input data-testid="typing-input" />
+        <button type="button">Done</button>
+      </Sheet>
+    );
+    expect(document.activeElement).toBe(input);
+  });
+
 });
